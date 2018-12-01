@@ -138,8 +138,8 @@ int main(int argc, char** argv){
                         if(deCon.isWithinSeachArea()){
                             //TODO assert that both Drones are in same UTM zone
                             if(deCon.crashDetected()){
-                                if(it->second.getPriority() == ourDrone.getPriority()){
-                                    //Deconflict SAME Priority
+                                if(it->second.getPriority() <= ourDrone.getPriority()){ //Deconflict  ourDrone SAME Priority or less
+                                    
                                     auto crash = deCon.getOurCrashSites();
                                     GPS crashPos = UTM2GPS(crash[0]);
 
@@ -153,15 +153,20 @@ int main(int argc, char** argv){
                                     if(ourDrone.getRawHeading() > it->second.getRawHeading()){
                                         crashPos.altitude+= (MIN_HEIGHT_EVASION+altCorrection);  
                                     }else if(ourDrone.getRawHeading() < it->second.getRawHeading()){
-                                        crashPos.altitude-= (MIN_HEIGHT_EVASION+altCorrection);
+                                        crashPos.altitude-= (MIN_HEIGHT_EVASION-altCorrection);
+                                    }else if(ourDrone.getID() > it->second.getID()){
+                                        crashPos.altitude+= (MIN_HEIGHT_EVASION+altCorrection);
+                                    }else{
+                                        crashPos.altitude-= (MIN_HEIGHT_EVASION-altCorrection);
                                     }
-
-
-                                }else if(it->second.getPriority() > ourDrone.getPriority()){
-                                    //If Drone Has Lower Priority
+                                    RedirectDrone msg;
+                                    msg.drone_id = ID;
+                                    msg.insertBeforeNextWayPoint = deCon.isOurCrashSitesBeforeWaypoint(0);
+                                    msg.position = crashPos;
+                                    Redirect_pub.publish(msg);
                                 }else{
-                                    //If Drone Has Higher Priority
-                            }
+                                    //If Our Drone Has Higher Priority
+                                }
                             }
                         }
                     }
