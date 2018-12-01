@@ -134,7 +134,7 @@ int main(int argc, char** argv){
                 std::cout << "################################ Drone "<< ID << "###############################" << std::endl;
                 simpleDrone ourDrone = OtherDrones[ID];
                 vector<UTM> ourDronePath = ourDrone.getPath(30);
-                std::cout << "Drone path size:" << ourDronePath.size();
+                std::cout << "Drone path size:" << ourDronePath.size() << endl;
                 for (auto it = OtherDrones.begin(); it != OtherDrones.end(); it++ )
                 { // first = key, second = data
                     if(it->first != ID){ // Make Sure it is not our Drone

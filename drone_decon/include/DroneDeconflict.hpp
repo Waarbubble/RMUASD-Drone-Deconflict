@@ -44,6 +44,7 @@ struct line{
 ostream& operator<<(ostream& os, const UTM& pos);
 ostream& operator<<(ostream& os, const point& pos);
 ostream& operator<<(ostream& os, const direction& pos);
+ostream& operator<<(ostream& os, const line& pos);
 
 
 

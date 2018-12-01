@@ -100,6 +100,11 @@ ostream& operator<<(ostream& os, const direction& pos)
     os << "direction("<< pos.east << ", " << pos.north <<")";  
     return os;  
 }  
+ostream& operator<<(ostream& os, const line& pos)  
+{  
+    os << "line("<< "0="<< pos.a << "X + " << pos.b << "Y + " << pos.c <<")";  
+    return os;  
+}  
 
 //################### SimpleDrone ######################
 simpleDrone::simpleDrone():
@@ -315,7 +320,7 @@ double simpleDroneDeconflict::time2point(point goal, direction heading, double v
     }else if(t2 == 0 && V.north < 0.000000001){
         t2 = t1;
     }
-    
+
     if(std::abs(t1-t2)>2){
         //TODO throw error
         std::cout << "ERROR point not on line - tdif =" << std::abs(t1-t2) << std::endl;
@@ -355,8 +360,10 @@ point simpleDroneDeconflict::line2pointPoint(line theLine,UTM pos){
     return result;
 }
 bool simpleDroneDeconflict::crashDetected(){
+    cout << "############## new crash detect #################" << endl; 
     bool crashIsDetected = true;
     line firstPart = getLine(otherDrone.getCurHeading(),otherDrone.getPositionU());
+    cout << "The Line: " << firstPart << endl; 
     double ourTime = ourDrone.getTime();
     double ourTimeStep = UTMdistance(ourDronePath[0],ourDronePath[1])/ourDrone.getEstimatedVelocity();
     bool nextWpReached = false;
