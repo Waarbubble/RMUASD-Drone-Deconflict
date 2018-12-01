@@ -135,7 +135,8 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node src/main.cpp src/DroneDeconflict.cpp)
+add_executable(${PROJECT_NAME}_node src/main.cpp src/DroneDeconflict.cpp src/geofunctions.h src/defines.h)
+add_executable(sim src/sim.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -148,9 +149,14 @@ add_executable(${PROJECT_NAME}_node src/main.cpp src/DroneDeconflict.cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_dependencies(${PROJECT_NAME}_node drone_decon_generate_messages_cpp)
+add_dependencies(sim drone_decon_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
+   ${catkin_LIBRARIES}
+)
+
+target_link_libraries(sim
    ${catkin_LIBRARIES}
 )
 
