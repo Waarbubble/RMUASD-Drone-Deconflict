@@ -87,7 +87,7 @@ drone_decon::UTMDrone makeDrone(unsigned int id, std::pair<double,double> curren
     drone.cur_vel = 10;
 
     drone.cur_heading = calculateHeading(gpsCurrent, gpsGoal);
-    drone.next_heading = drone.cur_heading;
+    drone.next_heading = calculateHeading(gpsGoal, gpsCurrent) - 5;
 
     drone.gps_time = int(std::time(nullptr));
     drone.ETA_next_WP = calculateETA(drone);
@@ -122,7 +122,7 @@ int main(int argc, char **argv)
     std::pair<double,double> nextCoord1(55.472169, 10.417184);
 
 
-    std::pair<double,double> currentCoord2(55.471871, 10.414911);
+    std::pair<double,double> currentCoord2(55.47228,10.41148);//(55.471871, 10.414911);
     std::pair<double,double> nextCoord2(55.471925, 10.417237);
 
     drone_decon::UTMDrone drone1 = makeDrone(3013, currentCoord2, nextCoord1);

@@ -136,7 +136,7 @@ int main(int argc, char** argv){
                 ID_t ID = ourDrones[i];
                 std::cout << "################################ Drone "<< ID << "###############################" << std::endl;
                 simpleDrone ourDrone = OtherDrones[ID];
-                vector<UTM> ourDronePath = ourDrone.getPath(simpleDroneDeconflict::maxSearchTime);
+                vector<UTM> ourDronePath = ourDrone.getPath(60);
                 std::cout << "Drone path size:" << ourDronePath.size() << endl;
                 for (auto it = OtherDrones.begin(); it != OtherDrones.end(); it++ )
                 { // first = key, second = data

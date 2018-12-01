@@ -419,7 +419,7 @@ bool simpleDroneDeconflict::crashDetected(){
     ourTime = ourDrone.getTime();
     for(size_t i = 0; i < ourDronePath.size(); i++){
         this->ourPositions.push_back(UTM2GPS(ourDronePath[i]));
-        point a = line2pointPoint(firstPart,ourDronePath[i]);
+        point a = line2pointPoint(secondPart,ourDronePath[i]);
         UTM aPoint = ourDronePath[i];
         aPoint.north = a.y;
         aPoint.east = a.x;
