@@ -146,7 +146,7 @@ int main(int argc, char **argv)
         droneListMsg.drone_list.clear();
         droneListMsg.drone_list.push_back(drone1);
         droneListMsg.drone_list.push_back(drone2);
-        droneListPub.publish(droneListMsg);
+        //droneListPub.publish(droneListMsg);
 
         //std::cout << "Running.." << std::endl;
 

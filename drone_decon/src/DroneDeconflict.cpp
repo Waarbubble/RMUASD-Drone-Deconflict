@@ -310,6 +310,12 @@ double simpleDroneDeconflict::time2point(point goal, direction heading, double v
 
     double t1= (goal.x-start.east)/(V.east);
     double t2= (goal.y-start.north)/(V.north);
+    if(t1 == 0 && V.east < 0.000000001){
+        t1=t2;
+    }else if(t2 == 0 && V.north < 0.000000001){
+        t2 = t1;
+    }
+    
     if(std::abs(t1-t2)>2){
         //TODO throw error
         std::cout << "ERROR point not on line - tdif =" << std::abs(t1-t2) << std::endl;

@@ -131,14 +131,17 @@ int main(int argc, char** argv){
             newUTMdata = false;
             for(size_t i = 0; i < ourDrones.size();i++){
                 ID_t ID = ourDrones[i];
+                std::cout << "################################ Drone "<< ID << "###############################" << std::endl;
                 simpleDrone ourDrone = OtherDrones[ID];
-                vector<UTM> ourDronePath = ourDrone.getPath(simpleDroneDeconflict::maxSearchTime);
-
+                vector<UTM> ourDronePath = ourDrone.getPath(30);
+                std::cout << "Drone path size:" << ourDronePath.size();
                 for (auto it = OtherDrones.begin(); it != OtherDrones.end(); it++ )
                 { // first = key, second = data
                     if(it->first != ID){ // Make Sure it is not our Drone
 
-                        std::cout << "############################## New detect ##############################" << std::endl;
+                        std::cout << "########### New detect ##########" << std::endl;
+                        cout << "OurDrone   : " << ourDrone.getPositionU() << endl;
+                        cout << "otherDrone : " << it->second.getPositionU() << endl;
                         simpleDroneDeconflict deCon(ourDrone,it->second,ourDronePath);
                         if(deCon.isSameHeight()){
                             std::cout << "Is same Height Area" << endl;
