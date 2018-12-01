@@ -62,7 +62,7 @@ void calculateNextDrone(drone_decon::UTMDrone &drone)
     drone.gps_time = currentTime;
     drone.ETA_next_WP = calculateETA(drone);
 
-    //std::cout.precision(10);
+    std::cout.precision(10);
     //std::cout << drone.cur_pos.latitude << ", " << drone.cur_pos.longitude << std::endl;
 }
 
@@ -139,13 +139,14 @@ int main(int argc, char **argv)
     loopRate.sleep();
 
     while(ros::ok()) {
-        std::cout << "Update and send drones" << std::endl;
+        //std::cout << "Update and send drones" << std::endl;
         calculateNextDrone(drone1);
-        //calculateNextDrone(drone2);
+        calculateNextDrone(drone2);
 
         droneListMsg.drone_list.clear();
         droneListMsg.drone_list.push_back(drone1);
         droneListMsg.drone_list.push_back(drone2);
+        droneListPub.publish(droneListMsg);
 
         //std::cout << "Running.." << std::endl;
 
