@@ -56,6 +56,7 @@ public:
   drone_decon::GPS getPosition();
   UTM getPositionU();
   UTM getNextPositionU();
+  float getRawHeading();
   direction getCurHeading();
   direction getNextHeading();
   double getCurVelocity();

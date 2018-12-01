@@ -54,14 +54,12 @@ UTM GPS2UTM(drone_decon::GPS coord){
   return ret;
 }
 
-direction operator*(direction lhs, const double& rhs)
-{
+direction operator*(direction lhs, const double& rhs){
     lhs.east*rhs;
     lhs.north*rhs;
     return lhs;
 }
-UTM operator+(UTM lhs, const direction& rhs)
-{
+UTM operator+(UTM lhs, const direction& rhs){
     lhs.east+rhs.east;
     lhs.north+rhs.north;
     return lhs;
@@ -133,6 +131,7 @@ direction simpleDrone::getHeading(double heading){
 
     return ret;
 }
+float simpleDrone::getRawHeading(){return this->cur_heading;}
 direction simpleDrone::getCurHeading(){return getHeading(this->cur_heading);}
 direction simpleDrone::getNextHeading(){return getHeading(this->next_heading);}
 double simpleDrone::getCurVelocity(){return this->cur_vel;}
@@ -151,7 +150,7 @@ vector<UTM> simpleDrone::getPath(double time,double distance_step){
     UTM curPos = this->getPositionU();
     UTM nextPos = this->getNextPositionU();
     //long int twp = this->gps_time-this->ETA_next_WP;
-
+    time+= std::time(nullptr)-this->getTime();
     double timeStep = distance_step/this->cur_vel_est;
     direction step = this->getCurHeading()*distance_step;
     vector<UTM> path;

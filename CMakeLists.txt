@@ -52,14 +52,15 @@ find_package(catkin REQUIRED
    GPS.msg
    UTMDrone.msg
    UTMDroneList.msg
+   RedirectDrone.msg
+   RegisterDrone.msg
 )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  takeOffAndLandCheck.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
