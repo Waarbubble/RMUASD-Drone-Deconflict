@@ -153,14 +153,7 @@ int main(int argc, char** argv){
                                 std::cout << "Is withing detection area" << endl;
                                 //TODO assert that both Drones are in same UTM zone
                                 if(deCon.crashDetected()){
-                                    cout << "OurPositions" << endl;
-                                    for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
-                                        cout << deCon.ourPositions[i].latitude <<  ", "<< deCon.ourPositions[i].longitude << endl;
-                                    }
-                                    cout << "OtherPositions" << endl;
-                                    for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
-                                        cout << deCon.otherPositions[i].latitude <<  ", "<< deCon.otherPositions[i].longitude << endl;
-                                    }
+                                    
                                     
                                     if(it->second.getPriority() <= ourDrone.getPriority()){ //Deconflict  ourDrone SAME Priority or less
                                         
@@ -198,6 +191,14 @@ int main(int argc, char** argv){
                                     }else{
                                         //If Our Drone Has Higher Priority
                                     }
+                                }
+                                cout << "OurPositions" << endl;
+                                for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
+                                    cout << deCon.ourPositions[i].latitude <<  ", "<< deCon.ourPositions[i].longitude << endl;
+                                }
+                                cout << "OtherPositions" << endl;
+                                for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
+                                    cout << deCon.otherPositions[i].latitude <<  ", "<< deCon.otherPositions[i].longitude << endl;
                                 }
                             }
                         }
