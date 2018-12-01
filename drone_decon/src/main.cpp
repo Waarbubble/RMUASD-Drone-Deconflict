@@ -161,7 +161,7 @@ int main(int argc, char** argv){
 
                                         cout << "CHRASHSITES" << endl;
                                         for(size_t i = 0; i < crash.size(); i ++){
-                                            cout << UTM2GPS(crash[i]) << endl;
+                                            cout << UTM2GPS(crash[i]).latitude << ", " << UTM2GPS(crash[i]).longitude << endl;
                                         }
                                         
 

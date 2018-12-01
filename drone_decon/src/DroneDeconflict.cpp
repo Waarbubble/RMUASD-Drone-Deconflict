@@ -1,7 +1,7 @@
 #include <DroneDeconflict.hpp>
 #include <iostream>
 #include <math.h>
-#include <cmath> 
+#include <cmath>
 #include <ctime>
 
 using namespace std;
@@ -36,7 +36,7 @@ double UTMdistance(UTM pos1, UTM pos2){
             std::pow(pos1.north-pos2.north,2)
         );
     }else{
-        //TODO 
+        //TODO
     }
 }
 
@@ -83,38 +83,38 @@ point UTM2point(UTM pos){
 
 }
 
-ostream& operator<<(ostream& os, const UTM& pos)  
-{  
-    os << "East(" << long(pos.east) << "), North(" << long(pos.north) << "), Alt(" << pos.altitude << ")";  
-    return os;  
-} 
-ostream& operator<<(ostream& os, const point& pos)  
-{  
-    os << "point("<< long(pos.x) << ", " << long(pos.y) << ")";  
-    return os;  
+ostream& operator<<(ostream& os, const UTM& pos)
+{
+    os << "East(" << long(pos.east) << "), North(" << long(pos.north) << "), Alt(" << pos.altitude << ")";
+    return os;
 }
-ostream& operator<<(ostream& os, const direction& pos)  
-{  
-    os << "direction("<< pos.east << ", " << pos.north <<")";  
-    return os;  
-}  
-ostream& operator<<(ostream& os, const line& pos)  
-{  
-    os << "line("<< "0="<< pos.a << "X + " << pos.b << "Y + " << pos.c <<")";  
-    return os;  
-}  
+ostream& operator<<(ostream& os, const point& pos)
+{
+    os << "point("<< long(pos.x) << ", " << long(pos.y) << ")";
+    return os;
+}
+ostream& operator<<(ostream& os, const direction& pos)
+{
+    os << "direction("<< pos.east << ", " << pos.north <<")";
+    return os;
+}
+ostream& operator<<(ostream& os, const line& pos)
+{
+    os << "line("<< "0="<< pos.a << "X + " << pos.b << "Y + " << pos.c <<")";
+    return os;
+}
 
 //################### SimpleDrone ######################
 simpleDrone::simpleDrone():
     vel_list(LIST_SIZE),gps_time_list(LIST_SIZE),cur_pos_list(LIST_SIZE){}
 simpleDrone::simpleDrone(drone_decon::UTMDrone info):
     vel_list(LIST_SIZE),gps_time_list(LIST_SIZE),cur_pos_list(LIST_SIZE)
-{   
+{
     this->update_values(info);
 }
 void simpleDrone::update_values(drone_decon::UTMDrone info){
     //Essential values
-    
+
     this->drone_priority = info.drone_priority;
     this->gps_time = info.gps_time;
     this->cur_pos = info.cur_pos;
@@ -127,7 +127,7 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
         this->gps_time_list.push_back(this->gps_time);
         this->gps_time_list.pop_front();
     }
-    
+
     //Update Current Heading
     if(info.cur_heading != -1){
         while(info.cur_heading > 360) info.cur_heading -= 360;
@@ -158,7 +158,7 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
         this->next_wp = UTM2GPS(cur);
         info.ETA_next_WP = -1;
     }
-    
+
 
     //Update Current Velocity
     if(info.cur_vel != -1){
@@ -170,9 +170,9 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
         }else{
             this->cur_vel = GPSdistanceMeters(this->cur_pos_list.front(),this->cur_pos_list.back())/t;
         }
-        info.ETA_next_WP = -1;        
+        info.ETA_next_WP = -1;
     }
-    
+
     if(this->drone_id == 0){
         for(size_t i = 0; i < vel_list.size();i++){
             vel_list[i]= info.cur_vel;
@@ -192,15 +192,15 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
     }
 
     if(this->ETA_next_WP != -1){
-        this->ETA_next_WP= info.ETA_next_WP;     
+        this->ETA_next_WP= info.ETA_next_WP;
     }else{
         this->ETA_next_WP= GPSdistanceMeters(this->cur_pos_list.front(),this->cur_pos_list.back())*this->cur_vel_est;
     }
 
     this->battery_soc = info.battery_soc;
-    
 
-    
+
+
 
     //Mmust be innitialized last so it can be detected if this is first Update
     this->drone_id = info.drone_id;
@@ -209,18 +209,10 @@ drone_decon::GPS simpleDrone::getPosition(){return this->cur_pos;}
 UTM simpleDrone::getPositionU(){return GPS2UTM(this->cur_pos);}
 UTM simpleDrone::getNextPositionU(){return GPS2UTM(this->next_wp);}
 direction simpleDrone::getHeading(double heading){
-    double angle;  
-    if(360>= heading && heading >= 270){
-        angle = 450-heading;
-    }else if (270>heading && heading > 90){
-        angle = -(heading-90);
-    }else{
-        angle = 90-heading;
-    }
-    angle = M_PI * angle/180;
+    heading = M_PI * heading/180;
     direction ret;
-    ret.north = std::sin(angle);
-    ret.east = std::cos(angle);
+    ret.north = std::cos(heading);
+    ret.east = std::sin(heading);
 
     return ret;
 }
@@ -271,8 +263,8 @@ vector<UTM> simpleDrone::getPath(double time,double distance_step){
             tNow+=timeStep;
         }
     }
-    return path;    
-    
+    return path;
+
 }
 
 
@@ -296,7 +288,7 @@ bool simpleDroneDeconflict::isSameHeight(){
         std::abs(otherPosNext.altitude-ourPosNext.altitude) < minAltDistance;
 }
 bool simpleDroneDeconflict::isWithinSeachArea(){
-    
+
     double maxSearchRadius = saftyMargin*(
                                 this->otherSearchTime*this->otherDrone.getEstimatedVelocity()
                                 + this->ourSearchTime*this->ourDrone.getEstimatedVelocity()
@@ -336,8 +328,8 @@ double simpleDroneDeconflict::time2point(point goal, direction heading, double v
         std::cout << "Using velocity        : " << V << endl;
         std::cout << "ETA1: " << t1 << " - ETA2: " << t2 << " - ETA: " << (t1+t2)/2 << endl;
     }
-   
-     return (t1+t2)/2; 
+
+     return (t1+t2)/2;
 }
 line simpleDroneDeconflict::getLine(direction heading, UTM pos){
     line result;
@@ -367,10 +359,10 @@ point simpleDroneDeconflict::line2pointPoint(line theLine,UTM pos){
     return result;
 }
 bool simpleDroneDeconflict::crashDetected(){
-    cout << "############## new crash detect #################" << endl; 
+    cout << "############## new crash detect #################" << endl;
     bool crashIsDetected = true;
     line firstPart = getLine(otherDrone.getCurHeading(),otherDrone.getPositionU());
-    cout << "The Line: " << firstPart << endl; 
+    cout << "The Line: " << firstPart << endl;
     double ourTime = ourDrone.getTime();
     double ourTimeStep = UTMdistance(ourDronePath[0],ourDronePath[1])/ourDrone.getEstimatedVelocity();
     bool nextWpReached = false;
@@ -393,7 +385,7 @@ bool simpleDroneDeconflict::crashDetected(){
             cout << "Time difference between drone visit: " << std::abs(tCol+otherDrone.getTime()-ourTime) << endl;
             /*if(tCol+otherDrone.getTime()>otherDrone.getEtaNextWP()){
                 break;
-            } 
+            }
             else*/ if (std::abs(tCol+otherDrone.getTime()-ourTime)<this->minTimeBetween*this->saftyMargin){
                 cout << "Drones Are within collision time" << endl;
                 double difHeight = otherDrone.getNextPositionU().altitude-otherDrone.getPositionU().altitude;
@@ -401,7 +393,7 @@ bool simpleDroneDeconflict::crashDetected(){
                                     (tCol/(otherDrone.getEtaNextWP()-otherDrone.getTime()))+
                                     otherDrone.getPositionU().altitude;
                 cout << "Cheacking altitude difference at collision: " << std::abs(altitude-ourDronePath[i].altitude) << endl;
-                if(std::abs(altitude-ourDronePath[i].altitude)<this->minAltDistance*this->saftyMargin){ 
+                if(std::abs(altitude-ourDronePath[i].altitude)<this->minAltDistance*this->saftyMargin){
                     cout << "Collision detected at:" <<  ourDronePath[i] << endl;
                     crashIsDetected = true;
                     ourCrashSites.push_back(ourDronePath[i]);
@@ -412,15 +404,15 @@ bool simpleDroneDeconflict::crashDetected(){
                     crashOther.north = collision.y;
                     crashOther.zone = otherDrone.getPositionU().zone;
                     otherCrashSites.push_back(crashOther);
-                    
-                }                    
-                
-                
-                
+
+                }
+
+
+
             }
-                    
+
         }
-        ourTime += ourTimeStep;    
+        ourTime += ourTimeStep;
     }
 
     line secondPart = getLine(otherDrone.getNextHeading(),otherDrone.getNextPositionU());
@@ -439,7 +431,7 @@ bool simpleDroneDeconflict::crashDetected(){
             if(tCol+otherDrone.getTime()>otherSearchTime+std::time(nullptr)){
                 cout << "Collision outside search time" << endl;
                 break;
-            } 
+            }
             else if (std::abs(tCol+otherDrone.getTime()-ourTime)<this->minTimeBetween){
                 cout << "Drones Are within collision time" << endl;
                 double altitude = otherDrone.getNextPositionU().altitude;
@@ -454,12 +446,12 @@ bool simpleDroneDeconflict::crashDetected(){
                     crashOther.north = collision.y;
                     crashOther.zone = otherDrone.getNextPositionU().zone;
                     otherCrashSites.push_back(crashOther);
-                }                    
-            }        
+                }
+            }
         }
-        ourTime += ourTimeStep;    
+        ourTime += ourTimeStep;
     }
-
+    return crashIsDetected;
 }
 bool simpleDroneDeconflict::takeOffCrashDetect(){
 
