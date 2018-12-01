@@ -46,10 +46,11 @@ double rad2deg(double rad);
 double GPSdistanceMeters(drone_decon::GPS pos1, drone_decon::GPS pos2);
 double UTMdistance(UTM pos1, UTM pos2);
 
+
+#define LIST_SIZE 4
 class simpleDrone{
 public:
   simpleDrone();
-  simpleDrone(ID_t ID,drone_decon::GPS cur_pos);
   simpleDrone(drone_decon::UTMDrone info);
 
   void update_values(drone_decon::UTMDrone info);
@@ -74,20 +75,36 @@ private:
 
   direction getHeading(double heading);
   drone_decon::GPS next_wp;
+
+  //Curent Pos
   drone_decon::GPS cur_pos;
+  deque<drone_decon::GPS> cur_pos_list;
 
   float next_vel;
+  float next_heading;
+
+  // Current velocity estimation
   float cur_vel;
   float cur_vel_est;
-  deque<float> vel_list;
+  deque<float> vel_list; 
   float vel_acc;
-  float next_heading;
+
+
+  long ETA_next_WP;
+  
   float cur_heading;
-  int time;
-  long gps_time;
+  
   int battery_soc;
   int drone_priority;
-  long ETA_next_WP;
+
+  long time;
+  deque<long> time_list;
+
+  // drone time 
+  long gps_time;
+  deque<long> gps_time_list;
+  
+
   ID_t drone_id;
 
 };
@@ -100,6 +117,7 @@ public:
   bool crashDetected();
   bool takeOffCrashDetect();
   std::vector<UTM> getOurCrashSites();
+  bool isOurCrashSitesBeforeWaypoint(size_t index);
   std::vector<UTM> getOtherCrashSites();
   
 
@@ -126,6 +144,8 @@ private:
   long otherSearchTime;
 
   std::vector<UTM> ourCrashSites;
+  std::vector<bool> isOurCrashSitesBeforeWaypointList;
+
   std::vector<UTM> otherCrashSites;
 
 

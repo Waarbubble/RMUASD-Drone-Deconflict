@@ -72,44 +72,104 @@ UTM& UTM::operator +=(const direction& b){
 }
 
 //################### SimpleDrone ######################
-simpleDrone::simpleDrone():vel_list(4){}
-simpleDrone::simpleDrone(ID_t ID, drone_decon::GPS curPos):
-    vel_list(10),cur_pos(curPos),drone_id(ID){}
-
-simpleDrone::simpleDrone(drone_decon::UTMDrone info):vel_list(4){
-    
+simpleDrone::simpleDrone():
+    vel_list(LIST_SIZE),gps_time_list(LIST_SIZE),cur_pos_list(LIST_SIZE){}
+simpleDrone::simpleDrone(drone_decon::UTMDrone info):
+    vel_list(LIST_SIZE),gps_time_list(LIST_SIZE),cur_pos_list(LIST_SIZE)
+{   
     this->update_values(info);
 }
 void simpleDrone::update_values(drone_decon::UTMDrone info){
-    this->next_wp = info.next_WP;
+    //Essential values
+    
+    this->drone_priority = info.drone_priority;
+    this->gps_time = info.gps_time;
     this->cur_pos = info.cur_pos;
-    this->next_vel = info.next_vel;
-    this->cur_vel = info.cur_vel;
+    if(this->drone_id == 0){
+        for(size_t i = 0; i < gps_time_list.size();i++) gps_time_list[i]= this->gps_time;
+        for(size_t i = 0; i < cur_pos_list.size();i++) cur_pos_list[i]= this->cur_pos;
+    }else{
+        this->cur_pos_list.push_back(this->cur_pos);
+        this->cur_pos_list.pop_front();
+        this->gps_time_list.push_back(this->gps_time);
+        this->gps_time_list.pop_front();
+    }
+    
+    //Update Current Heading
+    if(info.cur_heading != -1){
+        while(info.cur_heading > 360) info.cur_heading -= 360;
+        while(info.cur_heading<0 ) info.cur_heading +=360;
+        while(info.next_heading > 360) info.next_heading -= 360;
+        while(info.next_heading<0 ) info.next_heading +=360;
+        this->cur_heading = info.cur_heading;
+    }else{
+        this->cur_heading = 360;
+    }
 
+    //Update Next Heading
+    if(info.next_heading != -1){
+        this->next_heading = info.next_heading;
+    }else{
+        this->next_heading = this->cur_heading;
+    }
+
+    //Update Next Waypoint
+    if( info.next_WP.longitude != -1 &&
+        info.next_WP.latitude != -1 &&
+        info.next_WP.altitude != -1)
+    {
+        this->next_wp = info.next_WP;
+    }else{
+        UTM cur = this->getPositionU();
+        cur += this->getCurHeading()*this->getEstimatedVelocity()*20;
+        this->next_wp = UTM2GPS(cur);
+        info.ETA_next_WP = -1;
+    }
+    
+
+    //Update Current Velocity
+    if(info.cur_vel != -1){
+        this->cur_vel = info.cur_vel;
+    }else{
+        long t = std::abs(gps_time_list.front()-gps_time_list.back());
+        if(t == 0){
+            this->cur_vel = 0;
+        }else{
+            this->cur_vel = GPSdistanceMeters(this->cur_pos_list.front(),this->cur_pos_list.back())/t;
+        }
+        info.ETA_next_WP = -1;        
+    }
+    
     if(this->drone_id == 0){
         for(size_t i = 0; i < vel_list.size();i++){
             vel_list[i]= info.cur_vel;
             vel_acc+=info.cur_vel;
         }
+    }else{
+        this->vel_list.push_back(info.cur_vel);
+        this->vel_acc = info.cur_vel - this->vel_list.front();
+        this->vel_list.pop_front();
     }
-    this->vel_list.push_back(info.cur_vel);
-    this->vel_acc = info.cur_vel - this->vel_list.front();
-    this->vel_list.pop_front();
     this->cur_vel_est = this->vel_acc/this->vel_list.size();
 
-    while(info.cur_heading > 360) info.cur_heading -= 360;
-    while(info.cur_heading<0 ) info.cur_heading +=360;
-    while(info.next_heading > 360) info.next_heading -= 360;
-    while(info.next_heading<0 ) info.next_heading +=360;
+    if(this->next_vel != -1){
+        this->next_vel = info.next_vel;
+    }else{
+        this->next_vel = cur_vel_est;
+    }
 
-    this->next_heading = info.next_heading;
-    this->cur_heading = info.cur_heading;
-    this->time = info.time;
-    this->gps_time = info.gps_time;
+    if(this->ETA_next_WP != -1){
+        this->ETA_next_WP= info.ETA_next_WP;     
+    }else{
+        this->ETA_next_WP= GPSdistanceMeters(this->cur_pos_list.front(),this->cur_pos_list.back())*this->cur_vel_est;
+    }
+
     this->battery_soc = info.battery_soc;
-    this->drone_priority = info.drone_priority;
+    
 
-    this->ETA_next_WP= info.ETA_next_WP;
+    
+
+    //Mmust be innitialized last so it can be detected if this is first Update
     this->drone_id = info.drone_id;
 }
 drone_decon::GPS simpleDrone::getPosition(){return this->cur_pos;}
@@ -278,12 +338,14 @@ bool simpleDroneDeconflict::crashDetected(){
                 if(std::abs(altitude-ourDronePath[i].altitude)<this->minAltDistance*this->saftyMargin){
                     crashIsDetected = true;
                     ourCrashSites.push_back(ourDronePath[i]);
+                    isOurCrashSitesBeforeWaypointList.push_back(true);
                     UTM crashOther;
                     crashOther.altitude = altitude;
                     crashOther.east = collision.x;
                     crashOther.north = collision.y;
                     crashOther.zone = otherDrone.getPositionU().zone;
                     otherCrashSites.push_back(crashOther);
+                    
                 }                    
                 
                 
@@ -312,6 +374,7 @@ bool simpleDroneDeconflict::crashDetected(){
                 if(std::abs(altitude-ourDronePath[i].altitude)<this->minAltDistance){
                     crashIsDetected = true;
                     ourCrashSites.push_back(ourDronePath[i]);
+                    isOurCrashSitesBeforeWaypointList.push_back(false);
                     UTM crashOther;
                     crashOther.altitude = altitude;
                     crashOther.east = collision.x;
@@ -328,9 +391,13 @@ bool simpleDroneDeconflict::crashDetected(){
 bool simpleDroneDeconflict::takeOffCrashDetect(){
 
 }
-std::vector<UTM> simpleDroneDeconflict::getOurCrashSites(){
+bool simpleDroneDeconflict::isOurCrashSitesBeforeWaypoint(size_t index){
+    return this->isOurCrashSitesBeforeWaypointList[index];
+}
 
+std::vector<UTM> simpleDroneDeconflict::getOurCrashSites(){
+    return this->ourCrashSites;
 }
 std::vector<UTM> simpleDroneDeconflict::getOtherCrashSites(){
-    
+    return this->otherCrashSites;
 }
