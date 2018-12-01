@@ -71,6 +71,22 @@ UTM& UTM::operator +=(const direction& b){
     return *this;
 }
 
+ostream& operator<<(ostream& os, const UTM& pos)  
+{  
+    os << "East(" << pos.east << "), North(" << pos.north << "), Alt(" << pos.altitude << ")";  
+    return os;  
+} 
+ostream& operator<<(ostream& os, const point& pos)  
+{  
+    os << "point("<< pos.x << ", " << pos.y << ")";  
+    return os;  
+}
+ostream& operator<<(ostream& os, const direction& pos)  
+{  
+    os << "direction("<< pos.east << ", " << pos.north <<")";  
+    return os;  
+}  
+
 //################### SimpleDrone ######################
 simpleDrone::simpleDrone():
     vel_list(LIST_SIZE),gps_time_list(LIST_SIZE),cur_pos_list(LIST_SIZE){}
@@ -274,7 +290,7 @@ point simpleDroneDeconflict::pointOfCollision(direction heading1, UTM pos1, dire
     return result;
 }
 double simpleDroneDeconflict::time2point(point goal, direction heading, double velocity, UTM start){
-    direction &V = heading;
+    direction V = heading;
     V.east*=velocity;
     V.north*=velocity;
 
@@ -282,9 +298,14 @@ double simpleDroneDeconflict::time2point(point goal, direction heading, double v
     double t2= (goal.y-start.north)/(V.north);
     if(std::abs(t1-t2)>2){
         //TODO throw error
-        std::cout << "ERROR point not on line"<< std::endl;
+        std::cout << "ERROR point not on line - tdif =" << std::abs(t1-t2) << std::endl;
     }
-    return (t1+t2)/2;
+    std::cout << "Calculating time from : " << start << endl;
+    std::cout << "                   to : " << goal << endl;
+    std::cout << "Using velocity        : " << V << endl;
+    std::cout << "ETA1: " << t1 << " - ETA2: " << t2 << " - ETA: " << (t1+t2)/2 << endl;
+
+     return (t1+t2)/2; 
 }
 line simpleDroneDeconflict::getLine(direction heading, UTM pos){
     line result;

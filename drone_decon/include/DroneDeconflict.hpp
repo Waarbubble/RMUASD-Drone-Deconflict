@@ -40,6 +40,12 @@ struct line{
   double c;
 };
 
+ostream& operator<<(ostream& os, const UTM& pos);
+ostream& operator<<(ostream& os, const point& pos);
+ostream& operator<<(ostream& os, const direction& pos);
+
+
+
 drone_decon::GPS UTM2GPS(UTM coord);
 UTM GPS2UTM(drone_decon::GPS coord);
 double deg2rad(double deg);
