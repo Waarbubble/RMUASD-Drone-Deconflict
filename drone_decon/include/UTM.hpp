@@ -53,6 +53,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 
 
 namespace Geo
@@ -267,6 +268,7 @@ static inline void LLtoUTM(const double Lat, const double Long,
 static inline void UTMtoLL(const double UTMNorthing, const double UTMEasting,
                            const std::string &UTMZone, double& Lat,  double& Long )
 {
+  std::cout << "UTMtoLL0" << std::endl;
   double k0 = UTM_K0;
   double a = WGS84_A;
   double eccSquared = UTM_E2;
@@ -278,11 +280,12 @@ static inline void UTMtoLL(const double UTMNorthing, const double UTMEasting,
   double x, y;
   int ZoneNumber;
   char* ZoneLetter;
-
+  std::cout << "UTMtoLL1" << std::endl;
   x = UTMEasting - 500000.0;  // remove 500,000 meter offset for longitude
   y = UTMNorthing;
 
   ZoneNumber = strtoul(UTMZone.c_str(), &ZoneLetter, 10);
+  std::cout << "UTMtoLL2" << std::endl;
   if ((*ZoneLetter - 'N') < 0)
           {
             // remove 10,000,000 meter offset used for southern hemisphere

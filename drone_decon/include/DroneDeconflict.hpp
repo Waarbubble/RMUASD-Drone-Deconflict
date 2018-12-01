@@ -47,7 +47,7 @@ ostream& operator<<(ostream& os, const direction& pos);
 
 
 
-drone_decon::GPS UTM2GPS(UTM coord);
+drone_decon::GPS UTM2GPS(UTM &coord);
 UTM GPS2UTM(drone_decon::GPS coord);
 double deg2rad(double deg);
 double rad2deg(double rad);

@@ -40,11 +40,13 @@ double UTMdistance(UTM pos1, UTM pos2){
     }
 }
 
-drone_decon::GPS UTM2GPS(UTM coord){
-  drone_decon::GPS ret;
-  Geo::UTMtoLL(coord.north,coord.east,coord.zone,ret.latitude,ret.longitude);
-  ret.altitude=coord.altitude;
-  return ret;
+drone_decon::GPS UTM2GPS(UTM &coord){
+    cout << "GPS2UTM" << endl;
+    drone_decon::GPS ret;
+    Geo::UTMtoLL(coord.north,coord.east,coord.zone,ret.latitude,ret.longitude);
+    ret.altitude=coord.altitude;
+    cout << "GPS2UTM end" << endl;
+    return ret;
 
 }
 UTM GPS2UTM(drone_decon::GPS coord){
