@@ -133,11 +133,17 @@ int main(int argc, char** argv){
             for (auto it = OtherDrones.begin(); it != OtherDrones.end(); it++ )
             { // first = key, second = data
                 if(it->first != ID){ // Make Sure it is not our Drone
+
+                    std::cout << "############################## New detect ##############################" << std::endl;
                     simpleDroneDeconflict deCon(ourDrone,it->second,ourDronePath);
                     if(deCon.isSameHeight()){
+                        std::cout << "Is same Height Area" << endl;
+
                         if(deCon.isWithinSeachArea()){
+                            std::cout << "Is withing detection area" << endl;
                             //TODO assert that both Drones are in same UTM zone
                             if(deCon.crashDetected()){
+                                
                                 if(it->second.getPriority() <= ourDrone.getPriority()){ //Deconflict  ourDrone SAME Priority or less
                                     
                                     auto crash = deCon.getOurCrashSites();
