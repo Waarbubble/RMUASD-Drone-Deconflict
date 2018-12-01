@@ -51,6 +51,7 @@ ros::NodeHandle* nh;
 std::map<ID_t,simpleDrone> OtherDrones;
 std::vector<ID_t> ourDrones;
 
+bool newUTMdata = false;
 
 
 // ################################ Misulanius ###########################################
@@ -88,7 +89,8 @@ void UTMdrone_Handler(UTMDroneList msg){
         UTMDrone* drone = &msg.drone_list[i];
         OtherDrones[drone->drone_id].update_values(*drone);
         if(DEBUG) cout << "UTM Drone Update: " << OtherDrones[drone->drone_id].getID() << endl;
-    }  
+    }
+    newUTMdata = true;  
 }
 
 void RegisterDrone_Handler(RegisterDrone msg){
@@ -125,53 +127,56 @@ int main(int argc, char** argv){
         ros::spinOnce();
         r.sleep();
         // ############### Drone deconfliction ################
-        for(size_t i = 0; i < ourDrones.size();i++){
-            ID_t ID = ourDrones[i];
-            simpleDrone ourDrone = OtherDrones[ID];
-            vector<UTM> ourDronePath = ourDrone.getPath(simpleDroneDeconflict::maxSearchTime);
+        if(newUTMdata){
+            newUTMdata = false;
+            for(size_t i = 0; i < ourDrones.size();i++){
+                ID_t ID = ourDrones[i];
+                simpleDrone ourDrone = OtherDrones[ID];
+                vector<UTM> ourDronePath = ourDrone.getPath(simpleDroneDeconflict::maxSearchTime);
 
-            for (auto it = OtherDrones.begin(); it != OtherDrones.end(); it++ )
-            { // first = key, second = data
-                if(it->first != ID){ // Make Sure it is not our Drone
+                for (auto it = OtherDrones.begin(); it != OtherDrones.end(); it++ )
+                { // first = key, second = data
+                    if(it->first != ID){ // Make Sure it is not our Drone
 
-                    std::cout << "############################## New detect ##############################" << std::endl;
-                    simpleDroneDeconflict deCon(ourDrone,it->second,ourDronePath);
-                    if(deCon.isSameHeight()){
-                        std::cout << "Is same Height Area" << endl;
+                        std::cout << "############################## New detect ##############################" << std::endl;
+                        simpleDroneDeconflict deCon(ourDrone,it->second,ourDronePath);
+                        if(deCon.isSameHeight()){
+                            std::cout << "Is same Height Area" << endl;
 
-                        if(deCon.isWithinSeachArea()){
-                            std::cout << "Is withing detection area" << endl;
-                            //TODO assert that both Drones are in same UTM zone
-                            if(deCon.crashDetected()){
-                                
-                                if(it->second.getPriority() <= ourDrone.getPriority()){ //Deconflict  ourDrone SAME Priority or less
+                            if(deCon.isWithinSeachArea()){
+                                std::cout << "Is withing detection area" << endl;
+                                //TODO assert that both Drones are in same UTM zone
+                                if(deCon.crashDetected()){
                                     
-                                    auto crash = deCon.getOurCrashSites();
-                                    GPS crashPos = UTM2GPS(crash[0]);
-
-                                    //TODO check that min altitude is above ground
-                                    double minAltitude = 0;
-                                    double altCorrection = 0;
-                                    if(crashPos.altitude-MIN_HEIGHT_EVASION < minAltitude){
-                                        altCorrection = std::abs(crashPos.altitude-MIN_HEIGHT_EVASION-minAltitude);
-                                    }
+                                    if(it->second.getPriority() <= ourDrone.getPriority()){ //Deconflict  ourDrone SAME Priority or less
                                         
-                                    if(ourDrone.getRawHeading() > it->second.getRawHeading()){
-                                        crashPos.altitude+= (MIN_HEIGHT_EVASION+altCorrection);  
-                                    }else if(ourDrone.getRawHeading() < it->second.getRawHeading()){
-                                        crashPos.altitude-= (MIN_HEIGHT_EVASION-altCorrection);
-                                    }else if(ourDrone.getID() > it->second.getID()){
-                                        crashPos.altitude+= (MIN_HEIGHT_EVASION+altCorrection);
+                                        auto crash = deCon.getOurCrashSites();
+                                        GPS crashPos = UTM2GPS(crash[0]);
+
+                                        //TODO check that min altitude is above ground
+                                        double minAltitude = 0;
+                                        double altCorrection = 0;
+                                        if(crashPos.altitude-MIN_HEIGHT_EVASION < minAltitude){
+                                            altCorrection = std::abs(crashPos.altitude-MIN_HEIGHT_EVASION-minAltitude);
+                                        }
+                                            
+                                        if(ourDrone.getRawHeading() > it->second.getRawHeading()){
+                                            crashPos.altitude+= (MIN_HEIGHT_EVASION+altCorrection);  
+                                        }else if(ourDrone.getRawHeading() < it->second.getRawHeading()){
+                                            crashPos.altitude-= (MIN_HEIGHT_EVASION-altCorrection);
+                                        }else if(ourDrone.getID() > it->second.getID()){
+                                            crashPos.altitude+= (MIN_HEIGHT_EVASION+altCorrection);
+                                        }else{
+                                            crashPos.altitude-= (MIN_HEIGHT_EVASION-altCorrection);
+                                        }
+                                        RedirectDrone msg;
+                                        msg.drone_id = ID;
+                                        msg.insertBeforeNextWayPoint = deCon.isOurCrashSitesBeforeWaypoint(0);
+                                        msg.position = crashPos;
+                                        Redirect_pub.publish(msg);
                                     }else{
-                                        crashPos.altitude-= (MIN_HEIGHT_EVASION-altCorrection);
+                                        //If Our Drone Has Higher Priority
                                     }
-                                    RedirectDrone msg;
-                                    msg.drone_id = ID;
-                                    msg.insertBeforeNextWayPoint = deCon.isOurCrashSitesBeforeWaypoint(0);
-                                    msg.position = crashPos;
-                                    Redirect_pub.publish(msg);
-                                }else{
-                                    //If Our Drone Has Higher Priority
                                 }
                             }
                         }

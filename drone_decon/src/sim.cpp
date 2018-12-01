@@ -141,7 +141,7 @@ int main(int argc, char **argv)
     while(ros::ok()) {
         std::cout << "Update and send drones" << std::endl;
         calculateNextDrone(drone1);
-        //calculateNextDrone(drone2);
+        calculateNextDrone(drone2);
 
         droneListMsg.drone_list.clear();
         droneListMsg.drone_list.push_back(drone1);
