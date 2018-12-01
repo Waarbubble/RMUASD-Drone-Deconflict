@@ -56,7 +56,7 @@ void calculateNextDrone(drone_decon::UTMDrone &drone)
     drone.cur_pos.latitude += latIncrease;
     drone.cur_pos.longitude += lonIncrease;
 
-    std::cout << "drone.cur_heading: " << drone.cur_heading << std::endl;
+    //std::cout << "drone.cur_heading: " << drone.cur_heading << std::endl;
 
     drone.cur_heading = calculateHeading(drone.cur_pos, drone.next_WP);
     drone.gps_time = currentTime;
