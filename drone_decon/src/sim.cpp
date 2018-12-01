@@ -37,7 +37,7 @@ int calculateETA(drone_decon::UTMDrone &drone)
 
     int secondsToArrival = int(distance / drone.cur_vel);
 
-    return secondsToArrival + int(std::time(nullptr));
+    return secondsToArrival + int(drone.gps_time);
 }
 
 void calculateNextDrone(drone_decon::UTMDrone &drone)
@@ -51,7 +51,7 @@ void calculateNextDrone(drone_decon::UTMDrone &drone)
     double movementInY = sin(drone.cur_heading*PI/180) * distanceMoved;
 
     double latIncrease = movementInX / 111111.;
-    double lonIncrease = movementInY / 111111.;
+    double lonIncrease = movementInY / (111111. * cos(drone.cur_pos.latitude*PI/180));
 
     drone.cur_pos.latitude += latIncrease;
     drone.cur_pos.longitude += lonIncrease;
@@ -91,6 +91,8 @@ drone_decon::UTMDrone makeDrone(unsigned int id, std::pair<double,double> curren
 
     drone.gps_time = int(std::time(nullptr));
     drone.ETA_next_WP = calculateETA(drone);
+
+    drone.drone_priority = 3;
 
     return drone;
 }
@@ -139,7 +141,7 @@ int main(int argc, char **argv)
     while(ros::ok()) {
         std::cout << "Update and send drones" << std::endl;
         calculateNextDrone(drone1);
-        calculateNextDrone(drone2);
+        //calculateNextDrone(drone2);
 
         droneListMsg.drone_list.clear();
         droneListMsg.drone_list.push_back(drone1);
