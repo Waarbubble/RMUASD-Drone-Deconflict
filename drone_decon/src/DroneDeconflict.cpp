@@ -87,12 +87,12 @@ point UTM2point(UTM pos){
 
 ostream& operator<<(ostream& os, const UTM& pos)  
 {  
-    os << "East(" << pos.east << "), North(" << pos.north << "), Alt(" << pos.altitude << ")";  
+    os << "East(" << long(pos.east) << "), North(" << long(pos.north) << "), Alt(" << pos.altitude << ")";  
     return os;  
 } 
 ostream& operator<<(ostream& os, const point& pos)  
 {  
-    os << "point("<< pos.x << ", " << pos.y << ")";  
+    os << "point("<< long(pos.x) << ", " << long(pos.y) << ")";  
     return os;  
 }
 ostream& operator<<(ostream& os, const direction& pos)  
