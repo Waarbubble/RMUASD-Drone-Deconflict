@@ -140,14 +140,20 @@ int main(int argc, char** argv){
                             if(deCon.crashDetected()){
                                 if(it->second.getPriority() == ourDrone.getPriority()){
                                     //Deconflict SAME Priority
-                                        auto crash = deCon.getOurCrashSites();
-                                        GPS crashPos = UTM2GPS(crash[0]);
+                                    auto crash = deCon.getOurCrashSites();
+                                    GPS crashPos = UTM2GPS(crash[0]);
+
+                                    //TODO check that min altitude is above ground
+                                    double minAltitude = 0;
+                                    double altCorrection = 0;
+                                    if(crashPos.altitude-MIN_HEIGHT_EVASION < minAltitude){
+                                        altCorrection = std::abs(crashPos.altitude-MIN_HEIGHT_EVASION-minAltitude);
+                                    }
+                                        
                                     if(ourDrone.getRawHeading() > it->second.getRawHeading()){
-                                        crashPos.altitude+=MIN_HEIGHT_EVASION;
-                                        //TODO check that
+                                        crashPos.altitude+= (MIN_HEIGHT_EVASION+altCorrection);  
                                     }else if(ourDrone.getRawHeading() < it->second.getRawHeading()){
-
-
+                                        crashPos.altitude-= (MIN_HEIGHT_EVASION+altCorrection);
                                     }
 
 
