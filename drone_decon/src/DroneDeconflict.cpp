@@ -418,6 +418,12 @@ bool simpleDroneDeconflict::crashDetected(){
     line secondPart = getLine(otherDrone.getNextHeading(),otherDrone.getNextPositionU());
     ourTime = ourDrone.getTime();
     for(size_t i = 0; i < ourDronePath.size(); i++){
+        this->ourPositions.push_back(UTM2GPS(ourDronePath[i]));
+        point a = line2pointPoint(firstPart,ourDronePath[i]);
+        UTM aPoint = ourDronePath[i];
+        aPoint.north = a.y;
+        aPoint.east = a.x;
+        this->otherPositions.push_back(UTM2GPS(aPoint));
         double dist = line2pointDistance(secondPart,ourDronePath[i]);
         cout << "Distance between drones at: "  << UTM2point(ourDronePath[i]) << " and " << line2pointPoint(firstPart,ourDronePath[i]) << " = " << dist << endl;
         if(dist < this->minRadius*this->saftyMargin){
