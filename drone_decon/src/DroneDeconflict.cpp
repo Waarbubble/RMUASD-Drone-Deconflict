@@ -210,8 +210,8 @@ direction simpleDrone::getHeading(double heading){
     if(360>= heading && heading >= 270){
         angle = 450-heading;
     }else if (270>heading && heading > 90){
-        angle -(heading-90);
-    }else if(heading){
+        angle = -(heading-90);
+    }else{
         angle = 90-heading;
     }
     angle = M_PI * angle/180;
