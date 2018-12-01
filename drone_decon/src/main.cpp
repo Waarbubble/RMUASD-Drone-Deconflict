@@ -57,7 +57,9 @@ bool newUTMdata = false;
 // ################################ Misulanius ###########################################
 ostream& operator<<(ostream& os, const GPS& pos)  
 {  
-    os << "Lon(" << pos.longitude << "), Lat(" << pos.latitude << "), Alt(" << pos.altitude << ")";  
+    std::cout << std::fixed;
+    std::cout << std::setprecision(6);
+    os << "GPS(" << pos.latitude << ", " << pos.longitude << "), Alt(" << pos.altitude << ")";  
     return os;  
 } 
 
@@ -116,7 +118,8 @@ int main(int argc, char** argv){
     Register_sub = nh->subscribe("/drone_decon/register",100,RegisterDrone_Handler);
     //Heartbeat_pub = nh->advertise<node_monitor::heartbeat>("/node_monitor/input/Heartbeat",100);
     Redirect_pub = nh->advertise<RedirectDrone>("drone_decon/redirect",10);
-
+    std::cout << std::fixed;
+    std::cout << std::setprecision(6);
 
     int rate = 10;
     ros::Rate r(rate);
@@ -150,10 +153,25 @@ int main(int argc, char** argv){
                                 std::cout << "Is withing detection area" << endl;
                                 //TODO assert that both Drones are in same UTM zone
                                 if(deCon.crashDetected()){
+                                    cout << "OurPositions" << endl;
+                                    for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
+                                        cout << deCon.ourPositions[i].latitude <<  ", "<< deCon.ourPositions[i].longitude << endl;
+                                    }
+                                    cout << "OtherPositions" << endl;
+                                    for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
+                                        cout << deCon.otherPositions[i].latitude <<  ", "<< deCon.otherPositions[i].longitude << endl;
+                                    }
                                     
                                     if(it->second.getPriority() <= ourDrone.getPriority()){ //Deconflict  ourDrone SAME Priority or less
                                         
                                         auto crash = deCon.getOurCrashSites();
+
+                                        cout << "CHRASHSITES" << endl;
+                                        for(size_t i = 0; i < crash.size(); i ++){
+                                            cout << UTM2GPS(crash[i]) << endl;
+                                        }
+                                        
+
                                         GPS crashPos = UTM2GPS(crash[0]);
 
                                         //TODO check that min altitude is above ground

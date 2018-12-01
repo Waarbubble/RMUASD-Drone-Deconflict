@@ -41,11 +41,9 @@ double UTMdistance(UTM pos1, UTM pos2){
 }
 
 drone_decon::GPS UTM2GPS(UTM &coord){
-    cout << "GPS2UTM" << endl;
     drone_decon::GPS ret;
     Geo::UTMtoLL(coord.north,coord.east,coord.zone,ret.latitude,ret.longitude);
     ret.altitude=coord.altitude;
-    cout << "GPS2UTM end" << endl;
     return ret;
 
 }
@@ -57,8 +55,8 @@ UTM GPS2UTM(drone_decon::GPS coord){
 }
 
 direction operator*(direction lhs, const double& rhs){
-    lhs.east*rhs;
-    lhs.north*rhs;
+    lhs.east*=rhs;
+    lhs.north*=rhs;
     return lhs;
 }
 UTM operator+(UTM lhs, const direction& rhs){
@@ -242,12 +240,21 @@ double simpleDrone::getEtaNextWP(){return this->ETA_next_WP;}
 double simpleDrone::getBatterySOC(){return this->battery_soc;}
 uint8_t simpleDrone::getPriority(){return this->drone_priority;}
 vector<UTM> simpleDrone::getPath(double time,double distance_step){
+    cout << "################# Path Teselation ##############" << endl;
     UTM curPos = this->getPositionU();
     UTM nextPos = this->getNextPositionU();
-    //long int twp = this->gps_time-this->ETA_next_WP;
-    time+= std::time(nullptr)-this->getTime();
+
+    time+= std::abs(std::time(nullptr)-this->getTime());
+    cout << "Path calculate forward in time by: " << time << "s " << endl;
+    cout << "distance step: " << distance_step << endl;
+    cout << "current velocity: " << this->cur_vel_est << endl;
+
     double timeStep = distance_step/this->cur_vel_est;
+    cout << "Time step: "  << timeStep << endl;
+
     direction step = this->getCurHeading()*distance_step;
+    cout << "Direction step: " << step << endl;
+
     vector<UTM> path;
     double tNow = 0;
     while(UTMdistance(curPos,nextPos)>distance_step){
@@ -368,6 +375,12 @@ bool simpleDroneDeconflict::crashDetected(){
     double ourTimeStep = UTMdistance(ourDronePath[0],ourDronePath[1])/ourDrone.getEstimatedVelocity();
     bool nextWpReached = false;
     for(size_t i = 0; i < ourDronePath.size(); i++){
+        this->ourPositions.push_back(UTM2GPS(ourDronePath[i]));
+        point a = line2pointPoint(firstPart,ourDronePath[i]);
+        UTM aPoint = ourDronePath[i];
+        aPoint.north = a.y;
+        aPoint.east = a.x;
+        this->otherPositions.push_back(UTM2GPS(aPoint));
         double dist = line2pointDistance(firstPart,ourDronePath[i]);
         cout << "Distance between drones at: "  << UTM2point(ourDronePath[i]) << " and " << line2pointPoint(firstPart,ourDronePath[i]) << " = " << dist << endl;
         if(dist < this->minRadius*this->saftyMargin){

@@ -130,7 +130,8 @@ public:
   std::vector<UTM> getOtherCrashSites();
   
 
-  
+  std::vector<drone_decon::GPS> ourPositions;
+  std::vector<drone_decon::GPS> otherPositions;
 
 
   //All distance in meters, time in seconds
@@ -154,6 +155,8 @@ private:
 
   std::vector<UTM> ourCrashSites;
   std::vector<bool> isOurCrashSitesBeforeWaypointList;
+
+
 
   std::vector<UTM> otherCrashSites;
 
