@@ -32,6 +32,7 @@ struct UTM{
 struct point{
   double x;
   double y;
+  point& operator =(const UTM &b);
 };
 
 struct line{
@@ -46,13 +47,13 @@ ostream& operator<<(ostream& os, const direction& pos);
 
 
 
-drone_decon::GPS UTM2GPS(UTM coord);
+drone_decon::GPS UTM2GPS(UTM &coord);
 UTM GPS2UTM(drone_decon::GPS coord);
 double deg2rad(double deg);
 double rad2deg(double rad);
 double GPSdistanceMeters(drone_decon::GPS pos1, drone_decon::GPS pos2);
 double UTMdistance(UTM pos1, UTM pos2);
-
+point UTM2point(UTM pos);
 
 #define LIST_SIZE 4
 class simpleDrone{
