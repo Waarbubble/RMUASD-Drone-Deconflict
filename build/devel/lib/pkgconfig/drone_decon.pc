@@ -1,8 +1,0 @@
-prefix=/home/andkgl/wspace/catkin_ws/src/RMUASD-Drone-Deconflict/build/devel
-
-Name: drone_decon
-Description: Description of drone_decon
-Version: 0.0.0
-Cflags: -I/home/andkgl/wspace/catkin_ws/src/RMUASD-Drone-Deconflict/build/devel/include
-Libs: -L/home/andkgl/wspace/catkin_ws/src/RMUASD-Drone-Deconflict/build/devel/lib 
-Requires: 
