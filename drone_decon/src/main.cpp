@@ -160,7 +160,7 @@ int main(int argc, char** argv){
                                         auto crash = deCon.getOurCrashSites();
 
                                         cout << "CHRASHSITES" << endl;
-                                        for(size_t i = 0; i < crash.size(); i ++){
+                                        for(size_t i = 0; i < crash.size(); i++){
                                             cout << UTM2GPS(crash[i]).latitude << ", " << UTM2GPS(crash[i]).longitude << endl;
                                         }
                                         
@@ -194,11 +194,11 @@ int main(int argc, char** argv){
                                 }
                                 cout << "OurPositions" << endl;
                                 for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
-                                    cout << deCon.ourPositions[i].latitude <<  ", "<< deCon.ourPositions[i].longitude << endl;
+                                    ;//cout << deCon.ourPositions[i].latitude <<  ", "<< deCon.ourPositions[i].longitude << endl;
                                 }
                                 cout << "OtherPositions" << endl;
                                 for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
-                                    cout << deCon.otherPositions[i].latitude <<  ", "<< deCon.otherPositions[i].longitude << endl;
+                                    ;//cout << deCon.otherPositions[i].latitude <<  ", "<< deCon.otherPositions[i].longitude << endl;
                                 }
                             }
                         }
