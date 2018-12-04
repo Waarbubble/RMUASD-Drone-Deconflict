@@ -383,10 +383,12 @@ bool simpleDroneDeconflict::crashDetected(){
                                         otherDrone.getEstimatedVelocity(),
                                         otherDrone.getPositionU());
             cout << "Time difference between drone visit: " << std::abs(tCol+otherDrone.getTime()-ourTime) << endl;
-            /*if(tCol+otherDrone.getTime()>otherDrone.getEtaNextWP()){
+            if(tCol+otherDrone.getTime()>otherDrone.getEtaNextWP()){
                 break;
             }
-            else*/ if (std::abs(tCol+otherDrone.getTime()-ourTime)<this->minTimeBetween*this->saftyMargin){
+            else if (std::abs(tCol+otherDrone.getTime()-ourTime)<this->minTimeBetween*this->saftyMargin &&
+                     tCol > 0)
+            {
                 cout << "Drones Are within collision time" << endl;
                 double difHeight = otherDrone.getNextPositionU().altitude-otherDrone.getPositionU().altitude;
                 double altitude =   difHeight*
@@ -437,8 +439,9 @@ bool simpleDroneDeconflict::crashDetected(){
             if(tCol+otherDrone.getTime()>otherSearchTime+std::time(nullptr)){
                 cout << "Collision outside search time" << endl;
                 break;
-            }
-            else if (std::abs(tCol+otherDrone.getTime()-ourTime)<this->minTimeBetween){
+            }else if (std::abs(tCol+otherDrone.getTime()-ourTime)<this->minTimeBetween &&
+                      tCol > 0)
+            {
                 cout << "Drones Are within collision time" << endl;
                 double altitude = otherDrone.getNextPositionU().altitude;
                 if(std::abs(altitude-ourDronePath[i].altitude)<this->minAltDistance){
