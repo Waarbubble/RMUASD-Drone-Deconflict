@@ -288,7 +288,7 @@ vector<UTM> simpleDrone::getPath(double time,double distance_step){
         if(tNow < time){
             step = this->getNextHeading()*distance_step;
             while(tNow<time){
-                cout << "Time: " <<time << " - tNow: " << tNow << endl;
+                //cout << "Time: " <<time << " - tNow: " << tNow << endl;
                 path.push_back(curPos);
                 curPos+=step;
                 tNow+=timeStep;
