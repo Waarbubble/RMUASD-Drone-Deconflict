@@ -6,7 +6,7 @@
 #include <vector>
 #include <iostream>
 
-#include "defines.h"
+#include "defines.hpp"
 
 namespace GeoFunctions
 {

@@ -22,11 +22,13 @@
 
 // INCLUDE OWN FILES
 #include <DroneDeconflict.hpp>
+#include <defines.hpp> // DEBUG is defined in here
 
 using namespace std;
 using namespace drone_decon;
 
-#define DEBUG true
+
+
 #define DO_PREFLIGHT_CHECK false
 
 #define MIN_HEIGHT_EVASION 10
@@ -103,7 +105,10 @@ void RegisterDrone_Handler(RegisterDrone msg){
             break;
         }
     }
-    if(!alreadyThere) ourDrones.push_back(msg.drone_id);
+    if(!alreadyThere){
+        ourDrones.push_back(msg.drone_id);
+        cout << "[drone_decon]: drone registered with ID: " << msg.drone_id << endl;
+    } 
 }
 
 
@@ -134,23 +139,25 @@ int main(int argc, char** argv){
             newUTMdata = false;
             for(size_t i = 0; i < ourDrones.size();i++){
                 ID_t ID = ourDrones[i];
-                std::cout << "################################ Drone "<< ID << "###############################" << std::endl;
+                if(DEBUG) std::cout << "################################ Drone "<< ID << "###############################" << std::endl;
                 simpleDrone ourDrone = OtherDrones[ID];
-                vector<UTM> ourDronePath = ourDrone.getPath(60);
-                std::cout << "Drone path size:" << ourDronePath.size() << endl;
+                vector<UTM> ourDronePath = ourDrone.getPath(simpleDroneDeconflict::maxSearchTime);
+                if(DEBUG) std::cout << "Drone path size:" << ourDronePath.size() << endl;
                 for (auto it = OtherDrones.begin(); it != OtherDrones.end(); it++ )
                 { // first = key, second = data
                     if(it->first != ID){ // Make Sure it is not our Drone
 
-                        std::cout << "########### New detect ##########" << std::endl;
-                        cout << "OurDrone   : " << ourDrone.getPositionU() << endl;
-                        cout << "otherDrone : " << it->second.getPositionU() << endl;
+                        if(DEBUG){ 
+                            std::cout << "########### New detect ##########" << std::endl;
+                            cout << "OurDrone   : " << ourDrone.getPositionU() << endl;
+                            cout << "otherDrone : " << it->second.getPositionU() << endl;
+                        }
                         simpleDroneDeconflict deCon(ourDrone,it->second,ourDronePath);
                         if(deCon.isSameHeight()){
-                            std::cout << "Is same Height Area" << endl;
+                            if(DEBUG) std::cout << "Is same Height Area" << endl;
 
                             if(deCon.isWithinSeachArea()){
-                                std::cout << "Is withing detection area" << endl;
+                                if(DEBUG) std::cout << "Is withing detection area" << endl;
                                 //TODO assert that both Drones are in same UTM zone
                                 if(deCon.crashDetected()){
                                     
@@ -159,9 +166,11 @@ int main(int argc, char** argv){
                                         
                                         auto crash = deCon.getOurCrashSites();
 
-                                        cout << "CHRASHSITES" << endl;
-                                        for(size_t i = 0; i < crash.size(); i ++){
-                                            cout << UTM2GPS(crash[i]).latitude << ", " << UTM2GPS(crash[i]).longitude << endl;
+                                        if(DEBUG){
+                                            cout << "CHRASHSITES" << endl;
+                                            for(size_t i = 0; i < crash.size(); i ++){
+                                                cout << UTM2GPS(crash[i]).latitude << ", " << UTM2GPS(crash[i]).longitude << endl;
+                                            }
                                         }
                                         
 
@@ -192,13 +201,15 @@ int main(int argc, char** argv){
                                         //If Our Drone Has Higher Priority
                                     }
                                 }
-                                cout << "OurPositions" << endl;
-                                for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
-                                    cout << deCon.ourPositions[i].latitude <<  ", "<< deCon.ourPositions[i].longitude << endl;
-                                }
-                                cout << "OtherPositions" << endl;
-                                for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
-                                    cout << deCon.otherPositions[i].latitude <<  ", "<< deCon.otherPositions[i].longitude << endl;
+                                if(DEBUG){
+                                    cout << "OurPositions" << endl;
+                                    for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
+                                        cout << deCon.ourPositions[i].latitude <<  ", "<< deCon.ourPositions[i].longitude << endl;
+                                    }
+                                    cout << "OtherPositions" << endl;
+                                    for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
+                                        cout << deCon.otherPositions[i].latitude <<  ", "<< deCon.otherPositions[i].longitude << endl;
+                                    }
                                 }
                             }
                         }

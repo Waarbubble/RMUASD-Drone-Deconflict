@@ -13,7 +13,7 @@
 #include <drone_decon/RedirectDrone.h>
 #include <drone_decon/takeOffAndLandCheck.h>
 
-#include "geofunctions.h"
+#include "geofunctions.hpp"
 
 void gotRedirect(const drone_decon::RedirectDrone &msg)
 {

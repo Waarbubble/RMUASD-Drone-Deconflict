@@ -9,11 +9,14 @@
 #include <drone_decon/UTMDrone.h>
 
 #include <UTM.hpp>
+#include <defines.hpp>
 #define ID_t unsigned int
 #define PATH_t std::vector<drone_decon::GPS>
 #define uint8 unsigned char
 
 using namespace std;
+
+
 
 
 struct direction{
@@ -40,11 +43,12 @@ struct line{
   double b;
   double c;
 };
-
+class simpleDrone;
 ostream& operator<<(ostream& os, const UTM& pos);
 ostream& operator<<(ostream& os, const point& pos);
 ostream& operator<<(ostream& os, const direction& pos);
 ostream& operator<<(ostream& os, const line& pos);
+ostream& operator<<(ostream& os, simpleDrone d);
 
 
 
