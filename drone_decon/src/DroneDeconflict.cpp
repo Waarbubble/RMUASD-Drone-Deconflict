@@ -189,24 +189,25 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
     }
 
     if(this->drone_id == 0){
+        vel_acc = 0;
         for(size_t i = 0; i < vel_list.size();i++){
             vel_list[i]= info.cur_vel;
             vel_acc+=info.cur_vel;
-        }
+        }     
     }else{
         this->vel_list.push_back(info.cur_vel);
-        this->vel_acc = info.cur_vel - this->vel_list.front();
+        this->vel_acc += info.cur_vel - this->vel_list.front();
         this->vel_list.pop_front();
     }
     this->cur_vel_est = this->vel_acc/this->vel_list.size();
 
-    if(this->next_vel != -1){
+    if(info.next_vel != -1){
         this->next_vel = info.next_vel;
     }else{
         this->next_vel = cur_vel_est;
     }
 
-    if(this->ETA_next_WP != -1){
+    if(info.ETA_next_WP != -1){
         this->ETA_next_WP= info.ETA_next_WP;
     }else{
         this->ETA_next_WP= GPSdistanceMeters(this->cur_pos_list.front(),this->cur_pos_list.back())*this->cur_vel_est;
@@ -219,6 +220,7 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
 
     //Mmust be innitialized last so it can be detected if this is first Update
     this->drone_id = info.drone_id;
+    if(DEBUG) cout << *this << endl;
 }
 drone_decon::GPS simpleDrone::getPosition(){return this->cur_pos;}
 UTM simpleDrone::getPositionU(){return GPS2UTM(this->cur_pos);}
