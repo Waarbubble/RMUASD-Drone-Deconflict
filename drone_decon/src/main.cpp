@@ -166,17 +166,11 @@ int main(int argc, char** argv){
                                         
                                         auto crash = deCon.getOurCrashSites();
 
-<<<<<<< HEAD
                                         if(DEBUG){
                                             cout << "CHRASHSITES" << endl;
                                             for(size_t i = 0; i < crash.size(); i ++){
                                                 cout << UTM2GPS(crash[i]).latitude << ", " << UTM2GPS(crash[i]).longitude << endl;
                                             }
-=======
-                                        cout << "CHRASHSITES" << endl;
-                                        for(size_t i = 0; i < crash.size(); i++){
-                                            cout << UTM2GPS(crash[i]).latitude << ", " << UTM2GPS(crash[i]).longitude << endl;
->>>>>>> 886a49f5926d31e58177217354fcd7e38c714b6c
                                         }
                                         
 
@@ -207,7 +201,6 @@ int main(int argc, char** argv){
                                         //If Our Drone Has Higher Priority
                                     }
                                 }
-<<<<<<< HEAD
                                 if(DEBUG){
                                     cout << "OurPositions" << endl;
                                     for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
@@ -217,15 +210,6 @@ int main(int argc, char** argv){
                                     for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
                                         cout << deCon.otherPositions[i].latitude <<  ", "<< deCon.otherPositions[i].longitude << endl;
                                     }
-=======
-                                cout << "OurPositions" << endl;
-                                for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
-                                    ;//cout << deCon.ourPositions[i].latitude <<  ", "<< deCon.ourPositions[i].longitude << endl;
-                                }
-                                cout << "OtherPositions" << endl;
-                                for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
-                                    ;//cout << deCon.otherPositions[i].latitude <<  ", "<< deCon.otherPositions[i].longitude << endl;
->>>>>>> 886a49f5926d31e58177217354fcd7e38c714b6c
                                 }
                             }
                         }

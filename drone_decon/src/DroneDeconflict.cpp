@@ -391,13 +391,8 @@ point simpleDroneDeconflict::line2pointPoint(line theLine,UTM pos){
     return result;
 }
 bool simpleDroneDeconflict::crashDetected(){
-<<<<<<< HEAD
     if(DEBUG) cout << "############## new crash detect #################" << endl;
-    bool crashIsDetected = true;
-=======
-    cout << "############## new crash detect #################" << endl;
     bool crashIsDetected = false;
->>>>>>> 886a49f5926d31e58177217354fcd7e38c714b6c
     line firstPart = getLine(otherDrone.getCurHeading(),otherDrone.getPositionU());
     if(DEBUG) cout << "The Line: " << firstPart << endl;
     double ourTime = ourDrone.getTime();
@@ -411,12 +406,7 @@ bool simpleDroneDeconflict::crashDetected(){
         aPoint.east = a.x;
         this->otherPositions.push_back(UTM2GPS(aPoint));
         double dist = line2pointDistance(firstPart,ourDronePath[i]);
-<<<<<<< HEAD
         if(DEBUG) cout << "Distance between drones at: "  << UTM2point(ourDronePath[i]) << " and " << line2pointPoint(firstPart,ourDronePath[i]) << " = " << dist << endl;
-=======
-
-        cout << "Distance between drones at: "  << UTM2LL(UTM2point(ourDronePath[i])).x << ", " << UTM2LL(UTM2point(ourDronePath[i])).y << " and " << UTM2LL(line2pointPoint(firstPart,ourDronePath[i])).x << ", " << UTM2LL(line2pointPoint(firstPart,ourDronePath[i])).y << " = " << dist << endl;
->>>>>>> 886a49f5926d31e58177217354fcd7e38c714b6c
         if(dist < this->minRadius*this->saftyMargin){
             if(DEBUG) cout << "Drones within collision radius" << endl;
             point collision = line2pointPoint(firstPart,ourDronePath[i]);
@@ -471,11 +461,7 @@ bool simpleDroneDeconflict::crashDetected(){
         aPoint.east = a.x;
         this->otherPositions.push_back(UTM2GPS(aPoint));
         double dist = line2pointDistance(secondPart,ourDronePath[i]);
-<<<<<<< HEAD
         if(DEBUG) cout << "Distance between drones at: "  << UTM2point(ourDronePath[i]) << " and " << line2pointPoint(firstPart,ourDronePath[i]) << " = " << dist << endl;
-=======
-        cout << "Distance between drones at: "  << UTM2LL(UTM2point(ourDronePath[i])).x << ", " << UTM2LL(UTM2point(ourDronePath[i])).y << " and " << UTM2LL(line2pointPoint(firstPart,ourDronePath[i])).x << ", " << UTM2LL(line2pointPoint(firstPart,ourDronePath[i])).y << " = " << dist << endl;
->>>>>>> 886a49f5926d31e58177217354fcd7e38c714b6c
         if(dist < this->minRadius*this->saftyMargin){
             if(DEBUG) cout << "Drones within collision radius" << endl;
             point collision = line2pointPoint(secondPart,ourDronePath[i]);
