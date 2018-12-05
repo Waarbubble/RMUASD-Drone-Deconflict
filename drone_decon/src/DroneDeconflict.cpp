@@ -176,7 +176,7 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
 
 
     //Update Current Velocity
-    if(info.cur_vel != -1 && std::abs(info.cur_vel) < 50){
+    if(std::abs(info.cur_vel) > 0.00001 && std::abs(info.cur_vel) < 50){
         this->cur_vel = info.cur_vel;
     }else{
         long t = std::abs(gps_time_list.front()-gps_time_list.back());
@@ -185,21 +185,37 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
         }else{
             this->cur_vel = GPSdistanceMeters(this->cur_pos_list.front(),this->cur_pos_list.back())/t;
         }
+        if(this->cur_vel > 50){
+            cout << "t: " << t << endl;
+            cout << "vel: " << GPSdistanceMeters(this->cur_pos_list.front(),this->cur_pos_list.back()) << endl;
+        }
         info.ETA_next_WP = -1;
     }
-
     if(this->drone_id == 0){
         vel_acc = 0;
         for(size_t i = 0; i < vel_list.size();i++){
-            vel_list[i]= info.cur_vel;
-            vel_acc+=info.cur_vel;
+            vel_list[i]= this->cur_vel;
+            vel_acc+=this->cur_vel;
         }     
     }else{
-        this->vel_list.push_back(info.cur_vel);
-        this->vel_acc += info.cur_vel - this->vel_list.front();
+        this->vel_list.push_back(this->cur_vel);
+        this->vel_acc += this->cur_vel - this->vel_list.front();
+
         this->vel_list.pop_front();
     }
     this->cur_vel_est = this->vel_acc/this->vel_list.size();
+    
+    /*if( this->cur_vel_est > 50){
+        cout << "curvel: " << this->cur_vel << endl;
+        cout << "velest: " << this->cur_vel_est << endl;
+        cout << "velacc: " << this->vel_acc << endl;
+        cout << "vellist: ";
+        for(size_t i = 0; i < vel_list.size();i++){
+            cout << vel_list[i] << ", ";
+        }
+        cout << endl;
+        while(1);
+    }*/
 
     if(info.next_vel != -1){
         this->next_vel = info.next_vel;
@@ -264,15 +280,27 @@ vector<UTM> simpleDrone::getPath(double time,double distance_step){
     double timeStep = distance_step/this->cur_vel_est;
 
     vector<UTM> path;
-    if(std::abs(this->cur_vel_est) < 0.1){
+    if(std::abs(this->cur_vel_est) < 0.1 || std::abs(timeStep) <0.05){
         path.push_back(curPos);
+        if(std::abs(timeStep) <0.05){
+            cout << "distance step: " << distance_step << endl;
+            cout << "current velocity: " << this->cur_vel_est << endl;
+            throw "Vary Small time Step";
+        }
     }else{
         if(DEBUG) cout << "Time step: "  << timeStep << endl;
         if(timeStep > time/60){
             timeStep = time/60;
             distance_step = timeStep*this->cur_vel_est;
             if(DEBUG) cout << "Time step: "  << timeStep << endl;
+            
         }
+        if(std::abs(timeStep) <0.05){
+            cout << "TimeStep 0" << endl;
+            throw "Vary Small time Step";
+        };
+            
+
 
         direction step = this->getCurHeading()*distance_step;
         if(DEBUG) cout << "Direction step: " << step << endl;
@@ -288,7 +316,6 @@ vector<UTM> simpleDrone::getPath(double time,double distance_step){
         if(tNow < time){
             step = this->getNextHeading()*distance_step;
             while(tNow<time){
-                //cout << "Time: " <<time << " - tNow: " << tNow << endl;
                 path.push_back(curPos);
                 curPos+=step;
                 tNow+=timeStep;
@@ -398,7 +425,9 @@ bool simpleDroneDeconflict::crashDetected(){
     line firstPart = getLine(otherDrone.getCurHeading(),otherDrone.getPositionU());
     if(DEBUG) cout << "The Line: " << firstPart << endl;
     double ourTime = ourDrone.getTime();
+    cout << ourDrone.getEstimatedVelocity();
     double ourTimeStep = UTMdistance(ourDronePath[0],ourDronePath[1])/ourDrone.getEstimatedVelocity();
+    if(ourTimeStep == 0) ourTimeStep = this->ourSearchTime;
     bool nextWpReached = false;
     for(size_t i = 0; i < ourDronePath.size(); i++){
         this->ourPositions.push_back(UTM2GPS(ourDronePath[i]));

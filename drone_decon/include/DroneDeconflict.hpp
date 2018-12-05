@@ -119,7 +119,7 @@ private:
   deque<long> gps_time_list;
   
 
-  ID_t drone_id;
+  ID_t drone_id=0;
 
 };
 
