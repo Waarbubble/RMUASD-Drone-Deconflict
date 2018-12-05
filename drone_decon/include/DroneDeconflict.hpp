@@ -59,6 +59,7 @@ double rad2deg(double rad);
 double GPSdistanceMeters(drone_decon::GPS pos1, drone_decon::GPS pos2);
 double UTMdistance(UTM pos1, UTM pos2);
 point UTM2point(UTM pos);
+point UTM2LL(point utmCoord);
 
 #define LIST_SIZE 4
 class simpleDrone{
