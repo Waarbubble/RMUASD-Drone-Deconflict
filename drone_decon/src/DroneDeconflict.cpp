@@ -114,7 +114,7 @@ ostream& operator<<(ostream& os, simpleDrone d){
     os << "Est Velocity : " << d.getEstimatedVelocity() << endl;
     os << "drone Time   : " << d.getTime() << endl;
     os << "ETA next WP  : " << d.getEtaNextWP() << endl;
-    os << "Priority     : " << d.getPriority() << endl;
+    os << "Priority     : " << int(d.getPriority()) << endl;
     os << "Battery SOC  : " << d.getBatterySOC() << endl;
     return os;
 }
