@@ -176,7 +176,7 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
 
 
     //Update Current Velocity
-    if(info.cur_vel != -1){
+    if(info.cur_vel != -1 && std::abs(info.cur_vel) < 50){
         this->cur_vel = info.cur_vel;
     }else{
         long t = std::abs(gps_time_list.front()-gps_time_list.back());
