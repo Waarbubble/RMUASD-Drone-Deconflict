@@ -461,6 +461,7 @@ bool simpleDroneDeconflict::crashDetected(){
         if(DEBUG) cout << "Distance between drones at: "  << UTM2point(ourDronePath[i]) << " and " << line2pointPoint(firstPart,ourDronePath[i]) << " = " << dist << endl;
         if(dist < this->minRadius*this->saftyMargin){
             if(DEBUG) cout << "Drones within collision radius" << endl;
+            //########### THIS CODE IS IS ALSO RUN IN THE DEBUG CODE ABOVE ##################
             /*point collision = line2pointPoint(firstPart,ourDronePath[i]);
             double tCol = time2point(   collision,
                                         otherDrone.getCurHeading(),
