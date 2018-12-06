@@ -284,6 +284,8 @@ vector<UTM> simpleDrone::getPath(double time,double distance_step){
     vector<UTM> path;
     if(std::abs(this->cur_vel_est) < 0.1 || std::abs(timeStep) <0.05){
         path.push_back(curPos);
+        path.push_back(curPos);
+
         if(std::abs(timeStep) <0.05){
             cout << "distance step: " << distance_step << endl;
             cout << "current velocity: " << this->cur_vel_est << endl;
@@ -428,7 +430,15 @@ bool simpleDroneDeconflict::crashDetected(){
     if(DEBUG) cout << "The Line: " << firstPart << endl;
     double ourTime = ourDrone.getTime();
     cout << ourDrone.getEstimatedVelocity();
-    double ourTimeStep = UTMdistance(ourDronePath[0],ourDronePath[1])/ourDrone.getEstimatedVelocity();
+    double ourTimeStep;
+    try{
+        ourTimeStep = UTMdistance(ourDronePath[0],ourDronePath[1])/ourDrone.getEstimatedVelocity();
+    }catch(...){
+        cout << "Point0: " << ourDronePath[0] << endl;
+        cout << "Point1: " << ourDronePath[1] << endl;
+        cout << "Speed : " << ourDrone.getEstimatedVelocity() << endl;
+        throw "FIX Error line 439";
+    }
     if(ourTimeStep == 0) ourTimeStep = this->ourSearchTime;
     bool nextWpReached = false;
     for(size_t i = 0; i < ourDronePath.size(); i++){
