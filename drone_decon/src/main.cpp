@@ -19,6 +19,7 @@
 #include <drone_decon/RedirectDrone.h>
 #include <drone_decon/RegisterDrone.h>
 #include <drone_decon/takeOffAndLandCheck.h>
+#include <drone_decon/heartbeatDecon.h>
 
 // INCLUDE OWN FILES
 #include <DroneDeconflict.hpp>
@@ -52,6 +53,7 @@ ros::NodeHandle* nh;
 
 std::map<ID_t,simpleDrone> OtherDrones;
 std::vector<ID_t> ourDrones;
+heartbeatDecon heartbeat_msg;
 
 bool newUTMdata = false;
 
@@ -64,9 +66,17 @@ ostream& operator<<(ostream& os, const GPS& pos)
     os << "GPS(" << pos.latitude << ", " << pos.longitude << "), Alt(" << pos.altitude << ")";  
     return os;  
 } 
-
+namespace patch
+{
+    template < typename T > std::string to_string( const T& n )
+    {
+        std::ostringstream stm ;
+        stm << n ;
+        return stm.str() ;
+    }
+}
 // ############################ Helper functions ##################################
-/*void NodeState(uint8 severity,string msg,double rate = 0){
+void NodeState(uint8 severity,string msg,double rate = 0){
     double curRate = heartbeat_msg.rate;
     if(rate != 0){
         heartbeat_msg.rate = rate;
@@ -76,7 +86,7 @@ ostream& operator<<(ostream& os, const GPS& pos)
     heartbeat_msg.header.stamp = ros::Time::now();
     Heartbeat_pub.publish(heartbeat_msg);
     heartbeat_msg.rate = curRate;
-}*/
+}
 
 // ############################ Service ##################################
 
@@ -108,6 +118,7 @@ void RegisterDrone_Handler(RegisterDrone msg){
     if(!alreadyThere){
         ourDrones.push_back(msg.drone_id);
         cout << "[drone_decon]: drone registered with ID: " << msg.drone_id << endl;
+        NodeState(heartbeatDecon::info,string("Drone Registered ID: ")+patch::to_string(msg.drone_id));
     } 
 }
 
@@ -121,19 +132,20 @@ int main(int argc, char** argv){
     nh = new ros::NodeHandle();
     UTMDrone_sub = nh->subscribe("/utm/dronesList",100,UTMdrone_Handler);
     Register_sub = nh->subscribe("/drone_decon/register",100,RegisterDrone_Handler);
-    //Heartbeat_pub = nh->advertise<node_monitor::heartbeat>("/node_monitor/input/Heartbeat",100);
-    Redirect_pub = nh->advertise<RedirectDrone>("drone_decon/redirect",10);
+    Heartbeat_pub = nh->advertise<heartbeatDecon>("/drone_decon/Heartbeat",100);
+    Redirect_pub = nh->advertise<RedirectDrone>("/drone_decon/redirect",10);
     std::cout << std::fixed;
     std::cout << std::setprecision(6);
 
     int rate = 10;
     ros::Rate r(rate);
-    /*heartbeat_msg.rate = rate;
-    heartbeat_msg.severity = node_monitor::heartbeat::nothing;
-    heartbeat_msg.header.frame_id ="drone_decon";*/
+    heartbeat_msg.rate = rate;
+    heartbeat_msg.severity = heartbeatDecon::nothing;
+    heartbeat_msg.header.frame_id ="drone_decon";
     while(ros::ok()){
         ros::spinOnce();
         r.sleep();
+        NodeState(heartbeatDecon::nothing,"");
         // ############### Drone deconfliction ################
         if(newUTMdata){
             newUTMdata = false;

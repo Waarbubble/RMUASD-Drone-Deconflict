@@ -54,6 +54,7 @@ find_package(catkin REQUIRED
    UTMDroneList.msg
    RedirectDrone.msg
    RegisterDrone.msg
+   heartbeatDecon.msg
 )
 
 ## Generate services in the 'srv' folder
