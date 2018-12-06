@@ -3,6 +3,6 @@
 
 #define RADIUS_EARTH_METERS 6371000
 #define PI 3.14159265359
-#define DEBUG false
+#define DEBUG true
 
 #endif // DEFINES_H

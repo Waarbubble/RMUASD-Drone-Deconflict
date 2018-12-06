@@ -379,20 +379,29 @@ double simpleDroneDeconflict::time2point(point goal, direction heading, double v
 
     double t1= (goal.x-start.east)/(V.east);
     double t2= (goal.y-start.north)/(V.north);
+    if(std::isinf(t1)){
+        t1 = -1;
+    }
+    if(std::isinf(t2)){
+        t2= -1;
+    }
     if(t1 == 0 && V.east < 0.000000001){
         t1=t2;
     }else if(t2 == 0 && V.north < 0.000000001){
         t2 = t1;
     }
+    
 
     if(std::abs(t1-t2)>2){
-        //TODO throw error
         std::cout << "ERROR point not on line - tdif =" << std::abs(t1-t2) << std::endl;
         std::cout << "Calculating time from : " << start << endl;
         std::cout << "                   to : " << goal << endl;
         std::cout << "Using velocity        : " << V << endl;
         std::cout << "ETA1: " << t1 << " - ETA2: " << t2 << " - ETA: " << (t1+t2)/2 << endl;
+        throw "[time2point] error to large time diff";
     }
+        
+    //}
 
      return (t1+t2)/2;
 }
@@ -444,17 +453,23 @@ bool simpleDroneDeconflict::crashDetected(){
     for(size_t i = 0; i < ourDronePath.size(); i++){
 
         //##################### FOR DEBUG PURPOSES ##############################################
-        this->ourPositions.push_back(UTM2GPS(ourDronePath[i]));
-        point collision = line2pointPoint(firstPart,ourDronePath[i]);
-        UTM aPoint = ourDronePath[i];
-        aPoint.north = collision.y;
-        aPoint.east = collision.x;
-        double tCol = time2point(   collision,
-                                        otherDrone.getCurHeading(),
-                                        otherDrone.getEstimatedVelocity(),
-                                        otherDrone.getPositionU());
-        if(tCol>0){                                
-            this->otherPositions.push_back(UTM2GPS(aPoint));
+        if(DEBUG){
+            this->ourPositions.push_back(UTM2GPS(ourDronePath[i]));
+            point a = line2pointPoint(firstPart,ourDronePath[i]);
+            UTM aPoint = ourDronePath[i];
+            aPoint.north = a.y;
+            aPoint.east = a.x;
+            double tCol = time2point(   a,
+                                            otherDrone.getCurHeading(),
+                                            otherDrone.getEstimatedVelocity(),
+                                            otherDrone.getPositionU());
+            /*cout << "############## DEBUG OUT ##############" << endl;
+            cout << "tCol: " << tCol << endl;
+            cout << "pos : " << UTM2GPS(aPoint) << endl;*/
+
+            if(tCol>0){                                
+                this->otherPositions.push_back(UTM2GPS(aPoint));
+            }
         }
         //######################### REAL CODE ############################################
         double dist = line2pointDistance(firstPart,ourDronePath[i]);
@@ -462,12 +477,11 @@ bool simpleDroneDeconflict::crashDetected(){
         if(dist < this->minRadius*this->saftyMargin){
             if(DEBUG) cout << "Drones within collision radius" << endl;
             //########### THIS CODE IS IS ALSO RUN IN THE DEBUG CODE ABOVE ##################
-            /*point collision = line2pointPoint(firstPart,ourDronePath[i]);
+            point collision = line2pointPoint(firstPart,ourDronePath[i]);
             double tCol = time2point(   collision,
                                         otherDrone.getCurHeading(),
                                         otherDrone.getEstimatedVelocity(),
                                         otherDrone.getPositionU());
-            */
             if(DEBUG) cout << "Time difference between drone visit: " << std::abs(tCol+otherDrone.getTime()-ourTime) << endl;
             if(tCol+otherDrone.getTime()>otherDrone.getEtaNextWP()){
                 break;
