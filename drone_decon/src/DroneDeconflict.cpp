@@ -186,8 +186,10 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
             this->cur_vel = GPSdistanceMeters(this->cur_pos_list.front(),this->cur_pos_list.back())/t;
         }
         if(this->cur_vel > 50){
+            cout << "drone id: " << this->drone_id << endl;
             cout << "t: " << t << endl;
             cout << "vel: " << GPSdistanceMeters(this->cur_pos_list.front(),this->cur_pos_list.back()) << endl;
+            this->cur_vel = 5;
         }
         info.ETA_next_WP = -1;
     }
