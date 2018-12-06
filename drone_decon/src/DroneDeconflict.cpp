@@ -442,21 +442,31 @@ bool simpleDroneDeconflict::crashDetected(){
     if(ourTimeStep == 0) ourTimeStep = this->ourSearchTime;
     bool nextWpReached = false;
     for(size_t i = 0; i < ourDronePath.size(); i++){
+
+        //##################### FOR DEBUG PURPOSES ##############################################
         this->ourPositions.push_back(UTM2GPS(ourDronePath[i]));
-        point a = line2pointPoint(firstPart,ourDronePath[i]);
+        point collision = line2pointPoint(firstPart,ourDronePath[i]);
         UTM aPoint = ourDronePath[i];
-        aPoint.north = a.y;
-        aPoint.east = a.x;
-        this->otherPositions.push_back(UTM2GPS(aPoint));
+        aPoint.north = collision.y;
+        aPoint.east = collision.x;
+        double tCol = time2point(   collision,
+                                        otherDrone.getCurHeading(),
+                                        otherDrone.getEstimatedVelocity(),
+                                        otherDrone.getPositionU());
+        if(tCol>0){                                
+            this->otherPositions.push_back(UTM2GPS(aPoint));
+        }
+        //######################### REAL CODE ############################################
         double dist = line2pointDistance(firstPart,ourDronePath[i]);
         if(DEBUG) cout << "Distance between drones at: "  << UTM2point(ourDronePath[i]) << " and " << line2pointPoint(firstPart,ourDronePath[i]) << " = " << dist << endl;
         if(dist < this->minRadius*this->saftyMargin){
             if(DEBUG) cout << "Drones within collision radius" << endl;
-            point collision = line2pointPoint(firstPart,ourDronePath[i]);
+            /*point collision = line2pointPoint(firstPart,ourDronePath[i]);
             double tCol = time2point(   collision,
                                         otherDrone.getCurHeading(),
                                         otherDrone.getEstimatedVelocity(),
                                         otherDrone.getPositionU());
+            */
             if(DEBUG) cout << "Time difference between drone visit: " << std::abs(tCol+otherDrone.getTime()-ourTime) << endl;
             if(tCol+otherDrone.getTime()>otherDrone.getEtaNextWP()){
                 break;
