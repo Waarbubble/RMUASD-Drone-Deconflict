@@ -130,7 +130,7 @@ void RegisterDrone_Handler(RegisterDrone msg){
 int main(int argc, char** argv){
     ros::init(argc,argv,"drone_decon");
     nh = new ros::NodeHandle();
-    UTMDrone_sub = nh->subscribe("/utm/dronesList",100,UTMdrone_Handler);
+    UTMDrone_sub = nh->subscribe("/utm/dronesList",100,UTMdrone_Handler); 
     Register_sub = nh->subscribe("/drone_decon/register",100,RegisterDrone_Handler);
     Heartbeat_pub = nh->advertise<heartbeatDecon>("/drone_decon/Heartbeat",100);
     Redirect_pub = nh->advertise<RedirectDrone>("/drone_decon/redirect",10);
@@ -179,10 +179,15 @@ int main(int argc, char** argv){
                                         auto crash = deCon.getOurCrashSites();
 
                                         if(DEBUG){
+					    ofstream crashfile;
+					    crashfile.open ("crashfile.txt");
                                             cout << "CHRASHSITES" << endl;
                                             for(size_t i = 0; i < crash.size(); i ++){
+						crashfile << setprecision(10) << UTM2GPS(crash[i]).latitude << ", " << UTM2GPS(crash[i]).longitude << ", " << 
+							UTM2GPS(crash[i]).altitude << "\n";
                                                 cout << UTM2GPS(crash[i]).latitude << ", " << UTM2GPS(crash[i]).longitude << endl;
                                             }
+					    crashfile.close();
                                         }
                                         
 
@@ -214,14 +219,26 @@ int main(int argc, char** argv){
                                     }
                                 }
                                 if(DEBUG){
+				    ofstream drone1file;
+				    ofstream drone2file;	
+				    drone1file.open ("drone1file.txt");
+      				    drone2file.open ("drone2file.txt");
+   
                                     cout << "OurPositions" << endl;
+				    drone1file << setprecision(10) << OtherDrones[3013].getPosition().latitude << ", " << 						OtherDrones[3013].getPosition().longitude << ", " << OtherDrones[3013].getPosition().altitude << "\n";
+				    drone2file << setprecision(10) << OtherDrones[3012].getPosition().latitude << ", " << OtherDrones[3012].getPosition().longitude << ", " << OtherDrones[3012].getPosition().altitude << "\n";
                                     for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
+					drone1file << setprecision(10) << deCon.ourPositions[i].latitude <<  ", "<< deCon.ourPositions[i].longitude << ", " <<  							deCon.ourPositions[i].altitude << "\n";
                                         cout << deCon.ourPositions[i].latitude <<  ", "<< deCon.ourPositions[i].longitude << endl;
                                     }
+				    drone1file.close();
+			
                                     cout << "OtherPositions" << endl;
                                     for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
+					drone2file << setprecision(10) << deCon.otherPositions[i].latitude <<  ", "<< deCon.otherPositions[i].longitude << ", " 							<<  deCon.otherPositions[i].altitude << "\n";
                                         cout << deCon.otherPositions[i].latitude <<  ", "<< deCon.otherPositions[i].longitude << endl;
                                     }
+				    drone2file.close();
                                 }
                             }
                         }

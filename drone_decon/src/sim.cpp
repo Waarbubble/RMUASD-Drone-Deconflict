@@ -128,10 +128,10 @@ int main(int argc, char **argv)
     drone_decon::UTMDrone drone1 = makeDrone(3013, currentCoord2, nextCoord1);
 
     drone_decon::UTMDrone drone2 = makeDrone(3012, currentCoord1, nextCoord2);
-    drone2.cur_pos.altitude = 28;
+    drone2.cur_pos.altitude = 22;
     drone2.next_WP.altitude = 20;
     drone2.drone_priority = 3;
-    drone2.cur_vel = 10;
+    drone2.cur_vel = 50;
 
     drone_decon::UTMDroneList droneListMsg;
     droneListMsg.drone_list.push_back(drone1);
