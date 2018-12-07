@@ -3,6 +3,7 @@
 #include <math.h>
 #include <cmath>
 #include <ctime>
+#include <ros/ros.h>
 
 using namespace std;
 #define earthRadiusKm 6371.0
@@ -161,18 +162,8 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
         this->next_heading = this->cur_heading;
     }
 
-    //Update Next Waypoint
-    if( info.next_WP.longitude != -1 &&
-        info.next_WP.latitude != -1 &&
-        info.next_WP.altitude != -1)
-    {
-        this->next_wp = info.next_WP;
-    }else{
-        UTM cur = this->getPositionU();
-        cur += this->getCurHeading()*this->getEstimatedVelocity()*20;
-        this->next_wp = UTM2GPS(cur);
-        info.ETA_next_WP = -1;
-    }
+    bool invalid_next_WP = info.ETA_next_WP == -1;
+    
 
 
     //Update Current Velocity
@@ -185,12 +176,13 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
         }else{
             this->cur_vel = GPSdistanceMeters(this->cur_pos_list.front(),this->cur_pos_list.back())/t;
         }
-        if(this->cur_vel > 50){
-            cout << "drone id: " << this->drone_id << endl;
-            cout << "t: " << t << endl;
-            cout << "vel: " << GPSdistanceMeters(this->cur_pos_list.front(),this->cur_pos_list.back()) << endl;
-            this->cur_vel = 5;
-        }
+        
+        info.ETA_next_WP = -1;
+    }
+    if(this->cur_vel > 50){
+        cout << "drone id: " << this->drone_id << "is moving at: " << this->cur_vel << "m/s" << endl;
+        ROS_ERROR("Velocity is too high truncated to 5 m/s");
+        this->cur_vel = 5;
         info.ETA_next_WP = -1;
     }
     if(this->drone_id == 0){
@@ -207,7 +199,7 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
     }
     this->cur_vel_est = this->vel_acc/this->vel_list.size();
     
-    /*if( this->cur_vel_est > 50){
+    if( this->cur_vel_est > 50){
         cout << "curvel: " << this->cur_vel << endl;
         cout << "velest: " << this->cur_vel_est << endl;
         cout << "velacc: " << this->vel_acc << endl;
@@ -216,8 +208,23 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
             cout << vel_list[i] << ", ";
         }
         cout << endl;
-        while(1);
-    }*/
+        ROS_ERROR("Estimated Velocity To HIGH, using current velocity");
+        this->cur_vel_est = this->cur_vel;
+    }
+
+    //Update Next Waypoint
+    if(!((info.next_WP.longitude == -1 &&
+        info.next_WP.latitude == -1 &&
+        info.next_WP.altitude == -1) || 
+        invalid_next_WP))
+    {
+        this->next_wp = info.next_WP;
+    }else{
+        UTM cur = this->getPositionU();
+        cur += this->getCurHeading()*this->getEstimatedVelocity()*20;
+        this->next_wp = UTM2GPS(cur);
+        info.ETA_next_WP = -1;
+    }
 
     if(info.next_vel != -1){
         this->next_vel = info.next_vel;
@@ -438,7 +445,7 @@ bool simpleDroneDeconflict::crashDetected(){
     line firstPart = getLine(otherDrone.getCurHeading(),otherDrone.getPositionU());
     if(DEBUG) cout << "The Line: " << firstPart << endl;
     double ourTime = ourDrone.getTime();
-    cout << ourDrone.getEstimatedVelocity();
+    if(DEBUG) cout << "OurDrone Estimated velocity used in crash Detect" << ourDrone.getEstimatedVelocity();
     double ourTimeStep;
     try{
         ourTimeStep = UTMdistance(ourDronePath[0],ourDronePath[1])/ourDrone.getEstimatedVelocity();
