@@ -129,10 +129,12 @@ simpleDrone::simpleDrone(drone_decon::UTMDrone info):
     this->update_values(info);
 }
 void simpleDrone::update_values(drone_decon::UTMDrone info){
+    
+    
     //Essential values
-
     this->drone_priority = info.drone_priority;
     this->gps_time = info.gps_time;
+    this->time = info.time;
     this->cur_pos = info.cur_pos;
     if(this->drone_id == 0){
         for(size_t i = 0; i < gps_time_list.size();i++) gps_time_list[i]= this->gps_time;
@@ -185,6 +187,8 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
         this->cur_vel = 5;
         info.ETA_next_WP = -1;
     }
+
+    //Velocity Estimate
     if(this->drone_id == 0){
         vel_acc = 0;
         for(size_t i = 0; i < vel_list.size();i++){
