@@ -203,7 +203,7 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
     }
     this->cur_vel_est = this->vel_acc/this->vel_list.size();
     
-    if( this->cur_vel_est > 50){
+    if( this->cur_vel_est > 50 || this->cur_vel_est < 0){
         cout << "curvel: " << this->cur_vel << endl;
         cout << "velest: " << this->cur_vel_est << endl;
         cout << "velacc: " << this->vel_acc << endl;
@@ -212,8 +212,13 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
             cout << vel_list[i] << ", ";
         }
         cout << endl;
-        ROS_ERROR("Estimated Velocity To HIGH, using current velocity");
+        if(this->cur_vel_est > 50){
+            ROS_ERROR("Estimated Velocity To HIGH, using current velocity");
+        }else{
+            ROS_ERROR("Estimated Velocity To LOW, using current velocity")
+        }
         this->cur_vel_est = this->cur_vel;
+
     }
 
     //Update Next Waypoint
@@ -337,6 +342,9 @@ vector<UTM> simpleDrone::getPath(double time,double distance_step){
                 tNow+=timeStep;
                 if(tNow<0){
                     ROS_ERROR("tNow is less the 0");
+                    cout << "timeStep     : " << timeStep << endl;
+                    cout << "distance_step: " << distance_step << endl;
+                    cout << "vel_est      : " << this->cur_vel_est << endl;
                     break;
                 }
                 if(loops++ > 1000){
