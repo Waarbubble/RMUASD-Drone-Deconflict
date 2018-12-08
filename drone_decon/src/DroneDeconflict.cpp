@@ -266,7 +266,7 @@ double simpleDrone::getEstimatedVelocity(){return this->cur_vel_est;}
 double simpleDrone::getNextVelocity(){return this->next_vel;}
 ID_t simpleDrone::getID(){return this->drone_id;}
 long simpleDrone::getTime(){
-    if(this->gps_time < 10)
+    if(this->gps_time < 150000)
         return this->time;
     return this->gps_time;
 }
@@ -325,12 +325,23 @@ vector<UTM> simpleDrone::getPath(double time,double distance_step){
             if(tNow>time) break; 
         }
         if(tNow < time){
+            int loops = 0;
             step = this->getNextHeading()*distance_step;
             while(tNow<time){
                 path.push_back(curPos);
                 curPos+=step;
                 tNow+=timeStep;
-                if(tNow<0) while(1);
+                if(tNow<0){
+                    ROS_ERROR("tNow is less the 0");
+                    break;
+                }
+                if(loops++ > 1000){
+                    ROS_ERROR("Force quitting while loop, time too big")
+                    cout << "time       : " << time;
+                    cout << "SysTime    : " << std::time(nullptr);
+                    cout << "DroneTime  : " << this->getTime();
+                    break;
+                }
 
             }
         }
