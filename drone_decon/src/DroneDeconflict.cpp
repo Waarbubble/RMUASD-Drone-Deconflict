@@ -215,7 +215,7 @@ void simpleDrone::update_values(drone_decon::UTMDrone info){
         if(this->cur_vel_est > 50){
             ROS_ERROR("Estimated Velocity To HIGH, using current velocity");
         }else{
-            ROS_ERROR("Estimated Velocity To LOW, using current velocity")
+            ROS_ERROR("Estimated Velocity To LOW, using current velocity");
         }
         this->cur_vel_est = this->cur_vel;
 
