@@ -336,10 +336,10 @@ vector<UTM> simpleDrone::getPath(double time,double distance_step){
                     break;
                 }
                 if(loops++ > 1000){
-                    ROS_ERROR("Force quitting while loop, time too big")
-                    cout << "time       : " << time;
-                    cout << "SysTime    : " << std::time(nullptr);
-                    cout << "DroneTime  : " << this->getTime();
+                    ROS_ERROR("Force quitting while loop, search time too big");
+                    cout << "time       : " << time << endl;
+                    cout << "SysTime    : " << std::time(nullptr) << endl; 
+                    cout << "DroneTime  : " << this->getTime() << endl;
                     break;
                 }
 
