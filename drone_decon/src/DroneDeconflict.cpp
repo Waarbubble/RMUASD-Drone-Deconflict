@@ -270,9 +270,9 @@ double simpleDrone::getEstimatedVelocity(){return this->cur_vel_est;}
 double simpleDrone::getNextVelocity(){return this->next_vel;}
 ID_t simpleDrone::getID(){return this->drone_id;}
 long simpleDrone::getTime(){
-    if(this->gps_time < 150000)
-        return this->time;
-    return this->gps_time;
+    if(this->gps_time > 150000) return this->gps_time;  
+    if(this->time > 150000) return this->time;
+    return std::time(nullptr);
 }
 double simpleDrone::getEtaNextWP(){return this->ETA_next_WP;}
 double simpleDrone::getBatterySOC(){return this->battery_soc;}

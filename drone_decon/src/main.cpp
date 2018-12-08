@@ -234,7 +234,7 @@ int main(int argc, char** argv){
 				                    drone1file.close();
 			
                                     cout << "OtherPositions" << endl;
-                                    for(size_t i = 0; i < deCon.ourPositions.size(); i ++){
+                                    for(size_t i = 0; i < deCon.otherPositions.size(); i ++){
 					                    drone2file << setprecision(10) << deCon.otherPositions[i].latitude <<  ", "<< deCon.otherPositions[i].longitude << ", " 							<<  deCon.otherPositions[i].altitude << "\n";
                                         cout << deCon.otherPositions[i].latitude <<  ", "<< deCon.otherPositions[i].longitude << endl;
                                     }
